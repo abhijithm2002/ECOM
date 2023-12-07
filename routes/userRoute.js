@@ -11,7 +11,7 @@ user_route.use(express.static(path.join(__dirname, 'public')));
 // user_route.use(express.urlencoded({ extended: true });
 const userController = require('../controllers/userController');
 
-
+const s=10;
 
 
 
