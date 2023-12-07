@@ -27,7 +27,7 @@ user_route.post('/verifyOtp', userController.verifyOtp)
 user_route.get('/forget', userController.forgetLoad)  //isLogout
 user_route.post('/forget', userController.forgetVerify)
 user_route.get('/productList',userController.productList);
-user_route.get('/productDetails',auth.isLogin, userController.loadProductDetails);
+user_route.get('/productDetails', userController.loadProductDetails);
 user_route.get('/addCart',auth.isLogin, userController.loadCart);
 user_route.post('/addCart',auth.isLogin, userController.addToCart)
 user_route.put("/updateCartQuantity/:id/:quantity", userController.updateCartQuantity);
