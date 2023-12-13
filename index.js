@@ -7,6 +7,8 @@ const app = express();
 const path = require('path')
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
+require('dotenv').config()
+
 
 app.use(session({
   secret: 'your-secret-key',

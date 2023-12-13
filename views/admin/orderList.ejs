@@ -5,7 +5,7 @@
 <!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-orders-1.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:21 GMT -->
 <head>
     <meta charset="utf-8">
-    <title>Evara Dashboard</title>
+    <title>CHASHMA Dashboard</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,7 +14,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="/assetsb/imgs/theme/favicon.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="/assetsb/imgs/theme/toplogo.jpeg">
     <!-- Template CSS -->
     <link href="/assetsb/css/main.css" rel="stylesheet" type="text/css" />
 </head>
@@ -24,7 +24,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="/assetsb/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                <img src="/assetsb/imgs/theme/chashma.png" class="logo" alt="CHASHMA Dashboard">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -237,7 +237,14 @@
                                 <%for(i=0;i<order.length;i++){%>
                                 <tr>
                                     <td><%=order[i].orderId%></td>
-                                    <td><b><%=order[i].userId.name%></b></td>
+                                    
+                                    <td>
+                                        <% if (order[i].userId && order[i].userId.name) { %>
+                                            <b><%= order[i].userId.name %></b>
+                                        <% } else { %>
+                                            N/A
+                                            <% } %>
+                                        </td>
                                     <td><template class="__cf_email__" data-cfemail="aec3cfdcd8c7c0eecbd6cfc3dec2cb80cdc1c3">[email&#160;protected]</template></td>
                                     <td><%=order[i].totalAmount%></td>
                                    

@@ -1,17 +1,15 @@
 const express = require("express")
 const path = require('path')
 const user_route = express();
-const session = require('express-session');
+// const session = require('express-session');
 const config = require("../config/config")
-user_route.use(session({ secret: config.sessionSecret }))
+// user_route.use(session({ secret: config.sessionSecret }))
 const auth = require('../middleware/auth')
 user_route.set('view engine', "ejs")
 user_route.set('views', './views/users');
 user_route.use(express.static(path.join(__dirname, 'public')));
 // user_route.use(express.urlencoded({ extended: true });
 const userController = require('../controllers/userController');
-
-const s=10;
 
 
 
@@ -37,7 +35,8 @@ user_route.get('/addAddress',auth.isLogin, userController.loadAddress)
 user_route.post('/addAddress',auth.isLogin,userController.addAddress)
 user_route.get('/editAddress',auth.isLogin,userController.loadEditAddress)
 user_route.post('/updateAddress',auth.isLogin,userController.updateAddress)
-user_route.get('/checkout',auth.isLogin,userController.loadCheckout)
+user_route.get('/checkout',auth.isLogin,userController.loadCheckout);
+user_route.get('/applyCoupon',userController.applyCoupon);
 
 
 
@@ -48,6 +47,13 @@ const orderController = require('../controllers/orderController')
 user_route.post('/placeOrder', orderController.placeOrder);
 user_route.get('/orderDetails', orderController.loadOrderDetails);
 user_route.get('/cancelOrder', orderController.cancelOrder)
+user_route.post('/onlinePayment',orderController.onlinePayment);
+user_route.get('/onlinePayment', orderController.paymentSuccess);
+
+
+//......................................COUPON CONTROLLER.............................................
+
+
 
 
 module.exports = user_route;

@@ -5,7 +5,7 @@
 <!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-orders-detail.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:22 GMT -->
 <head>
     <meta charset="utf-8">
-    <title>Evara Dashboard</title>
+    <title>CHASHMA Dashboard</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,7 +14,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="/assetsb/imgs/theme/favicon.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="/assetsb/imgs/theme/toplogo.jpeg">
     <!-- Template CSS -->
     <link href="/assetsb/css/main.css" rel="stylesheet" type="text/css" />
 </head>
@@ -24,7 +24,7 @@
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
             <a href="index.html" class="brand-wrap">
-                <img src="/assetsb/imgs/theme/logo.svg" class="logo" alt="Evara Dashboard">
+                <img src="/assetsb/imgs/theme/chashma.png" class="logo" alt="CHASHMA Dashboard">
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
@@ -232,7 +232,12 @@
                                 <div class="text">
                                     <h6 class="mb-1">Customer</h6>
                                     <p class="mb-1">
-                                       <%=order.userId.name%> <br> <template class="__cf_email__" data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template> <br><%=order.userId.mobile%>
+                                        <% if (order.userId && order.userId.name) { %>
+                                       <%=order.userId.name%> 
+                                       <br> <template class="__cf_email__" data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template> <br><%=order.userId.mobile%>
+                                       <% } else { %>
+                                        N/A
+                                    <% } %>
                                     </p>
                                     <a href="#">View profile</a>
                                 </div>
@@ -322,7 +327,7 @@
                                                         <dl class="dlist">
                                                             <dt class="text-muted">Status:</dt>
                                                             <dd>
-                                                                <span class="badge rounded-pill alert-success text-success">Payment done</span>
+                                                                <span class="badge rounded-pill alert-success text-success"><%=order.paymentStatus%></span>
                                                             </dd>
                                                         </dl>
                                                     </article>

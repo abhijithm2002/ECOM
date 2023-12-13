@@ -3,6 +3,7 @@ const Product = require('../models/productModel')
 const Cart = require('../models/cartModel')
 const Orders = require('../models/ordersModel')
 const Category = require('../models/categoryModel')
+const Coupon = require('../models/couponModel')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
 const { name } = require('ejs')
@@ -290,31 +291,52 @@ const forgetVerify = async (req, res) => {
         console.log(error.message);
     }
 }
-// productList..
-// selectedCategory= req.query.category
-        // console.log("Selected Category:", selectedCategory);   
-   
-// const productList = async(req, res)=>{
+
+// const productList = async (req, res) => {
 //     try {
-             
-      
-//         const categoryName = req.query.name
-//         const userId = req.session.userId
-//         const catData = await Category.find({is_active:true})
-//         const product = await Product.find({ is_active: true })
-        
-//         if(categoryName='Category'){
-//            const product = await Product.find() 
-//         }else{
-//             const product = await Product.find({$and:{categoryName:categoryName}})
+//         const categoryName = req.query.category;
+//         const userId = req.session.userId;
+//         const catData = await Category.find({ is_active: true });
+
+//         let products;
+
+//         if (!categoryName || categoryName === 'Category') {
+          
+//             products = await Product.find({ is_active: true });
+//         } else {
+            
+//             products = await Product.find({ category: categoryName, is_active: true });
 //         }
-//         res.render('productList',{catData,product,selectedCategory})
+
+//         //sort
+//         const sortBy = req.query.sortBy || 'featured';
+
+//         switch (sortBy) {
+//             case 'lowToHigh':
+//                 products.sort((a, b) => a.regularPrice - b.regularPrice);
+//                 break;
+//             case 'highToLow':
+//                 products.sort((a, b) => b.regularPrice - a.regularPrice);
+//                 break;
+
+//             default:
+               
+//                 break;
+//         }
+
+//           res.render('productList', { catData, products, selectedCategory: categoryName });
+        
 //     } catch (error) {
-//         console.log(error.message)
+//         console.log(error.message);
 //     }
-// }
+// };
 const productList = async (req, res) => {
     try {
+        var search = '';
+        if (req.query.search) {
+            search = req.query.search;
+        }
+
         const categoryName = req.query.category;
         const userId = req.session.userId;
         const catData = await Category.find({ is_active: true });
@@ -322,11 +344,36 @@ const productList = async (req, res) => {
         let products;
 
         if (!categoryName || categoryName === 'Category') {
-            // Display all products if no category is selected or if "Category" is selected
-            products = await Product.find({ is_active: true });
+            products = await Product.find({
+                is_active: true,
+                $or: [
+                    { title: { $regex: '.*' + search + '.*', $options: 'i' } },
+                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } }
+                ]
+            });
         } else {
-            // Display products based on the selected category
-            products = await Product.find({ category: categoryName, is_active: true });
+            products = await Product.find({
+                category: categoryName,
+                is_active: true,
+                $or: [
+                    { title: { $regex: '.*' + search + '.*', $options: 'i' } },
+                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } }
+                ]
+            });
+        }
+
+        // Sort
+        const sortBy = req.query.sortBy || 'featured';
+
+        switch (sortBy) {
+            case 'lowToHigh':
+                products.sort((a, b) => a.regularPrice - b.regularPrice);
+                break;
+            case 'highToLow':
+                products.sort((a, b) => b.regularPrice - a.regularPrice);
+                break;
+            default:
+                break;
         }
 
         res.render('productList', { catData, products, selectedCategory: categoryName });
@@ -376,7 +423,7 @@ const loadCart = async (req, res) => {
         const id = req.session.userId;
 
         if (!id) {
-            // Redirect to login if userId is not set in the session
+            
             return res.redirect('/login');
         }
 
@@ -385,9 +432,9 @@ const loadCart = async (req, res) => {
 
         // Fetch cart data
         const cartData = await Cart.findOne({ userId: id }).populate('products.productId');
-        // console.log(cartData);
+        
         if (userData && cartData) {
-            res.render('addCart', { userData, cartData }); // Pass both userData and cartData to the template
+            res.render('addCart', { userData, cartData }); 
         } else {
             res.redirect('/login');
         }
@@ -679,18 +726,116 @@ const updateAddress = async (req, res) => {
 
 const loadCheckout = async (req, res) => {
     try {
+        const currentDate = Date.now();
         console.log(req.query.subtotal)
         const subtotal = parseInt(req.query.subtotal)
         const userId = req.session.userId;
         console.log(userId)
         const user = await User.findById(userId)
         const cart = await Cart.findOne({ userId}).populate('products.productId')
+        const coupon = await Coupon.find({
+            is_active: true,
+            expiry: { $gt: currentDate }, // Find coupons with expiry less than or equal to the current date
+            'redeemUsers.userId': { $ne: userId }, // Exclude coupons redeemed by the user
+        });
+
+
         console.log(user)
-        res.render('checkout',{user, cart, subtotal})
+        res.render('checkout',{user, cart, subtotal , coupon , message:""})
     } catch (error) {
         console.log(error.message)
     }
 }
+
+// let applyCoupon = async(req, res) => {
+//     try {
+//         const userId = req.session.userId;
+//         const couponCode = req.query.couponCode;
+
+//         // Find the user and the coupon
+//         const user = await User.findById(userId);
+//         const coupon = await Coupon.findOne({ couponCode, is_active: true });
+
+//         // Check if the coupon exists and is not already redeemed by the user
+//         if (coupon && coupon.redeemUsers.every(user => user.userId !== userId)) {
+//             // Assuming you have a method to calculate the subtotal
+//             const subtotal = calculateSubtotal(user.cart);
+
+//             // Check if the coupon is applicable based on the minimum purchase
+//             if (subtotal >= coupon.minPurchase) {
+//                 // Update the user's redeemed coupons
+//                 user.cart.coupon = {
+//                     couponCode: coupon.couponCode,
+//                     discountAmount: coupon.discountAmount
+//                 };
+
+//                 // Save the user with the updated cart
+//                 await user.save();
+
+//                 // Respond with the discount amount
+//                 res.json({ success: true, discountAmount: coupon.discountAmount });
+//             } else {
+//                 res.json({ success: false, message: 'Minimum purchase requirement not met.' });
+//             }
+//         } else {
+//             res.json({ success: false, message: 'Invalid coupon code or already redeemed.' });
+//         }
+//     } catch (error) {
+//         console.log(error.message);
+//         res.json({ success: false, message: 'An error occurred while applying the coupon.' });
+//     }
+// }
+
+
+let applyCoupon = async (req, res) => {
+    try {
+        req.session.couponCode = req.query.couponCode
+
+        const userId = req.session.userId
+        const couponCode = req.query.couponCode;
+        const totalAmount = req.query.totalAmount;
+        console.log(totalAmount)
+        const couponData = await Coupon.findOne({couponCode : couponCode})
+        if(!couponData){
+           return res.json({
+                message:'invalid Coupon',
+                finalPrice : totalAmount
+            })
+        }
+
+        const userData = await User.findById(userId);
+        const isRedeemed = couponData.redeemUsers.some(user => user.userId === userData._id.toString());
+        if(isRedeemed || totalAmount<couponData.minPurchase){
+            return res.status(200).json({
+                message:'coupon already used',  
+                finalPrice :  totalAmount
+              
+            })
+           
+        }else{
+
+
+            const finalPrice = totalAmount - couponData.discountAmount;
+            console.log(finalPrice)
+            console.log('couponData:',couponData.discountAmount)
+            const discountAmount = couponData.discountAmount
+            console.log('discountAmount',discountAmount)
+
+            res.status(200).json({
+                message: 'Coupon applied successfully',
+                finalPrice: finalPrice,
+                couponAmount : discountAmount
+            });
+            
+
+        }
+
+    } catch (error) {
+        console.log(error.messge)
+    }
+      
+};
+
 
 
 
@@ -716,7 +861,6 @@ module.exports = {
     addAddress,
     loadEditAddress,
     updateAddress,
-    
-
-    loadCheckout
+    loadCheckout,
+    applyCoupon
 }

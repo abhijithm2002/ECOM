@@ -27,11 +27,11 @@
         $('.slider-nav-thumbnails .slick-slide').eq(0).addClass('slick-active');
 
         // On before slide change match active thumbnail to current slide
-        // $('.product-image-slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
-        //     var mySlideNumber = nextSlide;
-        //     $('.slider-nav-thumbnails .slick-slide').removeClass('slick-active');
-        //     $('.slider-nav-thumbnails .slick-slide').eq(mySlideNumber).addClass('slick-active');
-        // });
+        $('.product-image-slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
+            var mySlideNumber = nextSlide;
+            $('.slider-nav-thumbnails .slick-slide').removeClass('slick-active');
+            $('.slider-nav-thumbnails .slick-slide').eq(mySlideNumber).addClass('slick-active');
+        });
 
         // $('.product-image-slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
         //     var img = $(slick.$slides[nextSlide]).find("img");

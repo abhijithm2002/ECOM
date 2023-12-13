@@ -14,7 +14,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/toplogo.jpeg">
     <!-- Template CSS -->
     <link href="assets/css/main.css" rel="stylesheet" type="text/css" />
     <style>
@@ -226,7 +226,7 @@
                                             
                                         </tr>
                                         <%}%>
-                                       
+                                      
                                         <tr>
                                             <td colspan="4">
                                                 <article class="float-end">
@@ -245,12 +245,13 @@
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>
                                                         <dd>
-                                                            <span class="badge rounded-pill alert-success text-success">Payment done</span>
+                                                            <span class="badge rounded-pill alert-success text-success" name="newOrderStatus"><%=orders.paymentStatus%></span>
                                                         </dd>
                                                     </dl>
                                                 </article>
                                             </td>
                                         </tr>
+                                        
                                     </tbody>
                                 </table>
                             </div> <!-- table-responsive// -->

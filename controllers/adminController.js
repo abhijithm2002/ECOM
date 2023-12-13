@@ -2,6 +2,7 @@ const User = require('../models/userModel')
 const Category = require('../models/categoryModel');
 const Product = require('../models/productModel')
 const Orders = require('../models/ordersModel')
+const Coupon = require('../models/couponModel')
 const bcrypt = require('bcrypt')
 const { query } = require('express');
 
@@ -395,7 +396,9 @@ const deleteProduct = async(req, res)=>{
 
 const loadOrderList = async(req, res)=>{
     try {
+        
         const orderData = await Orders.find({}).populate('userId').sort({orderDate :-1})
+       
         if(orderData){
         res.render('orderList',{order: orderData})
         }else{
@@ -426,7 +429,19 @@ const orderStatus = async(req, res)=>{
         console.log(orderId)
         const newOrderStatus = req.body.newOrderStatus
         console.log(newOrderStatus);
-     const orderData = await Orders.findByIdAndUpdate(orderId,{$set:{OrderStatus : newOrderStatus}},{new:true})
+        const paymentMethod = req.body.paymentMethod;
+
+        let paymentStatus;
+        if (paymentMethod === 'Cash On Delivery' && newOrderStatus === 'Delivered') {
+            paymentStatus = 'Success';
+        } else if (paymentMethod === 'Paypal') {
+            paymentStatus = 'Success';
+        } else {
+            paymentStatus = 'Pending';
+            
+        }
+
+     const orderData = await Orders.findByIdAndUpdate(orderId,{$set:{OrderStatus : newOrderStatus,paymentStatus: paymentStatus}},{new:true})
         console.log(newOrderStatus);
     //  res.redirect('/orderDetails?id=${orderId}')
     // res.redirect('/orderDetails',{orderData})
@@ -436,6 +451,8 @@ const orderStatus = async(req, res)=>{
         console.log(error.message)
     }
 }
+
+
 
 module.exports = {
     loadLogin,
@@ -458,7 +475,8 @@ module.exports = {
     deleteProduct,
     loadOrderList,
     loadOrderDetails,
-    orderStatus
+    orderStatus,
+   
 
 
 }
