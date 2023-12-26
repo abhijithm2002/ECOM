@@ -11,7 +11,7 @@ const { query } = require('express');
 
 const loadLogin = async (req, res) => {
     try {
-        res.render('login',{message:""})
+        res.render('login', { message: "" })
     } catch (error) {
         console.log(error.message);
     }
@@ -74,14 +74,6 @@ const verifyLogin = async (req, res) => {
 
 
 
-const loadDashboard = async (req, res) => {
-    try {
-        res.render('dashboard')
-    } catch (error) {
-        console.log(error.message);
-    }
-}
-
 const newUserLoad = async (req, res) => {
     try {
 
@@ -136,7 +128,7 @@ const loadCategory = async (req, res) => {
         const categories = await Category.find();
 
         // Render the EJS file and pass the categories data
-        res.render('addCategory', { categories ,message:'' });
+        res.render('addCategory', { categories, message: '' });
     } catch (error) {
         console.log(error.message)
     }
@@ -147,12 +139,12 @@ const addCategory = async (req, res) => {
     try {
         console.log(req.body.name)
         const categoryName = req.body.name
-        const excistingCategory = await Category.findOne({name:categoryName})
-        if(excistingCategory){
+        const excistingCategory = await Category.findOne({ name: categoryName })
+        if (excistingCategory) {
             const categories = await Category.find()
-            return res.render('addCategory',{categories, message:'Category already exsit'})
+            return res.render('addCategory', { categories, message: 'Category already exsit' })
         }
-        
+
         const category = new Category({
             name: req.body.name
         });
@@ -161,7 +153,7 @@ const addCategory = async (req, res) => {
         const categories = await Category.find();
 
         // Pass the categories data to the EJS file
-        res.render('addCategory', { categories , message:'' });
+        res.render('addCategory', { categories, message: '' });
 
     } catch (error) {
         console.log(error.message);
@@ -299,14 +291,14 @@ const productAction = async (req, res) => {
                 product,
                 { $set: { is_active: act === 1 ? true : false } },
                 { new: true })
-                if(productData){
-                    const product = await Product.find({})
-                    res.render('productList',{product : product})
-                }else{
-                    console.log('User not found or update failed');
-                    // Handle the case where the user is not found or the update fails
-                    res.status(404).send('User not found or update failed');
-                }
+            if (productData) {
+                const product = await Product.find({})
+                res.render('productList', { product: product })
+            } else {
+                console.log('User not found or update failed');
+                // Handle the case where the user is not found or the update fails
+                res.status(404).send('User not found or update failed');
+            }
 
         } else {
             console.log('Invalid act parameter');
@@ -321,7 +313,7 @@ const loadEditProduct = async (req, res) => {
     try {
         const id = req.query.id;
         const productData = await Product.findById(id);
-        
+
         // Assuming you want to find an active category
         const catData = await Category.find({ is_active: true });
 
@@ -352,39 +344,54 @@ const loadEditProduct = async (req, res) => {
 // }
 const updateProduct = async (req, res) => {
     try {
-        console.log(req.query.id);
+        const productId = req.query.id;
+        console.log(productId);
+
+        let updatedFields = {
+            title: req.body.title,
+            frameMaterial: req.body.frameMaterial,
+            frameColour: req.body.frameColour,
+            style: req.body.style,
+            templeColour: req.body.templeColour,
+            lensTechnology: req.body.lensTechnology,
+            lensColour: req.body.lensColour,
+            brand: req.body.brand,
+            description: req.body.description,
+            regularPrice: req.body.regularPrice,
+            promoPrice: req.body.promoPrice,
+            quantity: req.body.quantity,
+            category: req.body.category,
+            gender: req.body.gender,
+            tags: req.body.tags,
+        };
+
+        if (req.files && req.files.length > 0) {
+            updatedFields.image = req.files.map((file) => file.path);
+        }
+
+
+        if (req.body.currentImages && Array.isArray(req.body.currentImages)) {
+            updatedFields.image = updatedFields.image ? updatedFields.image.concat(req.body.currentImages) : req.body.currentImages;
+        }
+
         const productData = await Product.findByIdAndUpdate(
-            { _id: req.query.id },
+            { _id: productId },
             {
-                $set: {
-                    title: req.body.title,
-                    frameMaterial: req.body.frameMaterial,
-                    frameColour: req.body.frameColour,
-                    style: req.body.style,
-                    templeColour: req.body.templeColour,
-                    lensTechnology: req.body.lensTechnology,
-                    lensColour: req.body.lensColour,
-                    brand: req.body.brand,
-                    description: req.body.description, 
-                    regularPrice: req.body.regularPrice,
-                    promoPrice: req.body.promoPrice,
-                    quantity: req.body.quantity,
-                    category: req.body.category,
-                    gender: req.body.gender,
-                    tags: req.body.tags,
-                    image: req.files.map((file) => file.path),
-                },
+                $set: updatedFields,
             },
             { new: true } // to return the updated document
         );
-        console.log(productData)
+
+        console.log(productData);
         res.redirect("/admin/productList");
     } catch (error) {
         console.log(error.message);
     }
 };
 
-const deleteProduct = async(req, res)=>{
+
+
+const deleteProduct = async (req, res) => {
     try {
         const id = req.query.id;
         await Product.deleteOne({ _id: id })
@@ -394,14 +401,14 @@ const deleteProduct = async(req, res)=>{
     }
 }
 
-const loadOrderList = async(req, res)=>{
+const loadOrderList = async (req, res) => {
     try {
-        
-        const orderData = await Orders.find({}).populate('userId').sort({orderDate :-1})
-       
-        if(orderData){
-        res.render('orderList',{order: orderData})
-        }else{
+
+        const orderData = await Orders.find({}).populate('userId').sort({ orderDate: -1 })
+
+        if (orderData) {
+            res.render('orderList', { order: orderData })
+        } else {
             res.write('No orders');
             res.end();
         }
@@ -413,51 +420,157 @@ const loadOrderList = async(req, res)=>{
 const loadOrderDetails = async (req, res) => {
     try {
         const orderId = req.query.id;
-        
+
         const orderDetails = await Orders.findById(orderId).populate('products.productId').populate('userId');
 
-        res.render('orderDetails', { order: orderDetails, orderId:orderId });
+        res.render('orderDetails', { order: orderDetails, orderId: orderId });
     } catch (error) {
         console.log(error.message);
     }
 };
 
 
-const orderStatus = async(req, res)=>{
-    try {
-        const orderId = req.query.id
-        console.log(orderId)
-        const newOrderStatus = req.body.newOrderStatus
-        console.log(newOrderStatus);
-        const paymentMethod = req.body.paymentMethod;
+// const orderStatus = async(req, res)=>{
+//     try {
+//         const orderId = req.query.id
+//         console.log(orderId)
+//         const newOrderStatus = req.body.newOrderStatus
+//         console.log(newOrderStatus);
+//         const paymentMethod = req.body.paymentMethod;
 
-        let paymentStatus;
-        if (paymentMethod === 'Cash On Delivery' && newOrderStatus === 'Delivered') {
-            paymentStatus = 'Success';
-        } else if (paymentMethod === 'Paypal') {
-            paymentStatus = 'Success';
-        } else {
-            paymentStatus = 'Pending';
-            
+//         let paymentStatus;
+//         if (paymentMethod === 'Cash On Delivery' && newOrderStatus === 'Delivered') {
+//             paymentStatus = 'Success';
+//             console.log('paymentStatus',paymentStatus)
+//         } else if (paymentMethod === 'Paypal') {
+//             paymentStatus = 'Success';
+//         } else {
+//             paymentStatus = 'Pending';
+
+//         }
+
+//      const orderData = await Orders.findByIdAndUpdate(orderId,{$set:{OrderStatus : newOrderStatus,paymentStatus: paymentStatus}},{new:true})
+//         console.log(newOrderStatus);
+//     //  res.redirect('/orderDetails?id=${orderId}')
+//     // res.redirect('/orderDetails',{orderData})
+//     res.redirect('/admin/orderDetails?id=' + orderId);
+
+//     } catch (error) {
+//         console.log(error.message)
+//     }
+// }
+const orderStatus = async (req, res) => {
+    try {
+        const orderId = req.query.id;
+        console.log(orderId);
+        const newOrderStatus = req.body.newOrderStatus;
+        console.log(newOrderStatus);
+
+        let paymentStatus = 'pending';
+        if (newOrderStatus == 'Delivered') {
+            paymentStatus = 'Success'
         }
 
-     const orderData = await Orders.findByIdAndUpdate(orderId,{$set:{OrderStatus : newOrderStatus,paymentStatus: paymentStatus}},{new:true})
+        const orderData = await Orders.findByIdAndUpdate(
+            orderId,
+            { $set: { OrderStatus: newOrderStatus, paymentStatus: paymentStatus } },
+            { new: true }
+        );
+        console.log('orderData:', orderData)
         console.log(newOrderStatus);
-    //  res.redirect('/orderDetails?id=${orderId}')
-    // res.redirect('/orderDetails',{orderData})
-    res.redirect('/admin/orderDetails?id=' + orderId);
-        
+        res.redirect('/admin/orderDetails?id=' + orderId);
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
     }
-}
+};
+
+// const loadSalesReport = async (req, res) => {
+//     try {
+//         const orders = await Orders.find().populate('products.productId').populate('userId');
+//         //orderlist
+
+//         const totalOrders = orders.length;
+//         const uniqueConstomers = new Set(orders.map(order => order.userId.toString())).size;
+//         const cashOnDelivery = orders.filter(order => order.paymentMethod ==='Cash On Delivery').length;
+//         const onlinePayment = orders.filter(order => order.paymentMethod === 'Paypal').length;
+//         const orderCancelled = orders.filter(order => order.OrderStatus === 'Order Cancelled').length;
+
+//         const totalTransactionAmount = orders.reduce((total, order)=> total + order.totalAmount ,0)
+//         res.render('salesReport', { orders,totalOrders,uniqueConstomers,cashOnDelivery,onlinePayment,orderCancelled,totalTransactionAmount });
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(500).send('Internal Server Error');
+//     }
+// };
+const loadSalesReport = async (req, res) => {
+    try {
+        const orderId = req.query.id;
+        const { time_period, startDate, endDate } = req.query;
+        let orders = await Orders.find().populate('products.productId').populate('userId');
+
+        // Filter orders based on the selected time period
+        let filteredOrders = orders;
+        if (time_period === 'weekly') {
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Start of the week (Sunday)
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            filteredOrders = orders.filter(order => order.orderDate >= startOfWeek);
+        } else if (time_period === 'monthly') {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+
+            filteredOrders = orders.filter(order => order.orderDate >= startOfMonth);
+        } else if (time_period === 'yearly') {
+            const now = new Date();
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+            startOfYear.setHours(0, 0, 0, 0);
+
+            filteredOrders = orders.filter(order => order.orderDate >= startOfYear);
+        }
+
+        // Start and end date
+        if (startDate && endDate) {
+            const startDateTime = new Date(startDate);
+            const endDateTime = new Date(endDate);
+            endDateTime.setHours(23, 59, 59, 999);
+
+            filteredOrders = orders.filter(order => order.orderDate >= startDateTime && order.orderDate <= endDateTime);
+        }
+
+        // Calculate statistics for the filtered orders
+        const totalOrders = filteredOrders.length;
+        const uniqueConstomers = new Set(orders.map(order => order.userId.toString())).size;
+        const cashOnDelivery = filteredOrders.filter(order => order.paymentMethod === 'Cash On Delivery').length;
+        const onlinePayment = filteredOrders.filter(order => order.paymentMethod === 'Paypal').length;
+        const orderCancelled = filteredOrders.filter(order => order.OrderStatus === 'Order Cancelled').length;
+        const totalTransactionAmount = filteredOrders.reduce((total, order) => total + order.totalAmount, 0);
+
+        res.render('salesReport', {
+            orders: filteredOrders,
+            totalOrders,
+            uniqueConstomers,
+            cashOnDelivery,
+            onlinePayment,
+            orderCancelled,
+            totalTransactionAmount,
+            selectedTimePeriod: time_period || 'all',
+            orderId: orderId
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 
 
 module.exports = {
     loadLogin,
     verifyLogin,
-    loadDashboard,
+
     newUserLoad,
     userAction,
     loadCategory,
@@ -476,7 +589,8 @@ module.exports = {
     loadOrderList,
     loadOrderDetails,
     orderStatus,
-   
+    loadSalesReport
+
 
 
 }

@@ -6,11 +6,18 @@ const Category = require('../models/categoryModel')
 const Coupon = require('../models/couponModel')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
+const moment = require('moment')
 const { name } = require('ejs')
 
-const securePassword =async(password)=>{
+const formatedCouponDate = (date) => {
+    return moment(date).format('MMMM DD, YYYY hh:mm A');
+
+};
+
+
+const securePassword = async (password) => {
     try {
-        const passwordHash = await bcrypt.hash(password,10 );
+        const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
         console.log(error.message)
@@ -20,7 +27,7 @@ const securePassword =async(password)=>{
 
 const loadLogin = async (req, res) => {
     try {
-       
+
         res.render('login', { message: "" })
     } catch (error) {
         console.log(error.message);
@@ -33,12 +40,14 @@ const verifyLogin = async (req, res) => {
         const password = req.body.password;
 
         const userData = await User.findOne({ email: email });
+        // const userData = await User.findOneAndUpdate({ email: email },{$set:{wallet:0}});
+
 
         if (userData) {
             const isPasswordCorrect = await bcrypt.compare(password, userData.password)
-            
+
             // if (password === userData.password)
-            if(isPasswordCorrect) {
+            if (isPasswordCorrect) {
                 req.session.userId = userData._id
                 console.log(req.session.userId);
                 // Password is correct, redirect to home
@@ -104,6 +113,7 @@ const loadRegister = async (req, res) => {
 // }
 
 
+
 const insertUser = async (req, res) => {
     try {
         const { name, email, mno, password, cPassword } = req.body;
@@ -119,12 +129,15 @@ const insertUser = async (req, res) => {
             // If not, proceed with the registration process
             console.log('hello')
             const hashedPassword = await securePassword(password)
+
+            const currentDate = new Date();
             let obj = {
                 name,
                 email,
                 mobile: mno,
-                password:hashedPassword,
-                cPassword: cPassword
+                password: hashedPassword,
+                cPassword: cPassword,
+                date: currentDate
             }
             console.log(cPassword)
 
@@ -172,7 +185,7 @@ const loadVerifyOtp = async (req, res) => {
                 console.log('Email sent: ' + info.response);
             }
         });
-        const message = 'ot sent successfully';
+        const message = 'otp sent successfully';
         res.render('verifyOtp', { message })
 
 
@@ -239,7 +252,7 @@ const verifyOtp = async (req, res) => {
 
             const userData = await user.save();
 
-            console.log(userData,'uyuygfityftyofotu');
+            console.log(userData, 'uyuygfityftyofotu');
 
             if (userData) {
                 res.redirect('/login');
@@ -258,9 +271,28 @@ const verifyOtp = async (req, res) => {
 
 const loadHome = async (req, res) => {
     try {
+
+        var search = '';
+        if (req.query.search) {
+            search = req.query.search;
+        }
+
         const isLoggedIn = !!req.session.userId
-        const product = await Product.find({ is_active: true })
-        res.render('home', { product,isLoggedIn })
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+
+
+        // const product = await Product.find({ is_active: true  })
+
+        const product = await Product.find({
+            is_active: true,
+            $or: [
+                { title: { $regex: '.*' + search + '.*', $options: 'i' } },
+                { brand: { $regex: '.*' + search + '.*', $options: 'i' } }
+            ]
+        });
+
+        res.render('home', { product, isLoggedIn, user })
     } catch (error) {
         console.log(error.message);
     }
@@ -301,10 +333,10 @@ const forgetVerify = async (req, res) => {
 //         let products;
 
 //         if (!categoryName || categoryName === 'Category') {
-          
+
 //             products = await Product.find({ is_active: true });
 //         } else {
-            
+
 //             products = await Product.find({ category: categoryName, is_active: true });
 //         }
 
@@ -320,30 +352,36 @@ const forgetVerify = async (req, res) => {
 //                 break;
 
 //             default:
-               
+
 //                 break;
 //         }
 
 //           res.render('productList', { catData, products, selectedCategory: categoryName });
-        
+
 //     } catch (error) {
 //         console.log(error.message);
 //     }
 // };
 const productList = async (req, res) => {
     try {
+
+
         var search = '';
         if (req.query.search) {
             search = req.query.search;
         }
 
-        const categoryName = req.query.category;
+        const categoryId = req.query.category;
         const userId = req.session.userId;
         const catData = await Category.find({ is_active: true });
-
+        let catName = await Category.findById(categoryId)
+        if(!catName){
+            catName=''
+        }
         let products;
 
-        if (!categoryName || categoryName === 'Category') {
+        if (!categoryId) {
+            
             products = await Product.find({
                 is_active: true,
                 $or: [
@@ -352,8 +390,9 @@ const productList = async (req, res) => {
                 ]
             });
         } else {
+            
             products = await Product.find({
-                category: categoryName,
+                category: categoryId,
                 is_active: true,
                 $or: [
                     { title: { $regex: '.*' + search + '.*', $options: 'i' } },
@@ -375,8 +414,8 @@ const productList = async (req, res) => {
             default:
                 break;
         }
-
-        res.render('productList', { catData, products, selectedCategory: categoryName });
+         
+        res.render('productList', { catData, products, selectedCategory: catName.name });
     } catch (error) {
         console.log(error.message);
     }
@@ -385,45 +424,26 @@ const productList = async (req, res) => {
 
 const loadProductDetails = async (req, res) => {
     try {
+        const isLoggedIn = !!req.session.userId
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
         const productId = req.query.productId
         const product = await Product.findById(productId)
 
 
-        res.render('productDetails', { product })
+        res.render('productDetails', { product, isLoggedIn, user })
     } catch (error) {
         console.log(error.message)
     }
 }
 
-// load cart page..
-
-// const loadCart = async (req, res) => {
-//     try {
-//         const id = req.session.userId;
-//         console.log(id)
-//         if (!id) {
-//             // Redirect to login if userId is not set in the session
-//             return res.redirect('/login');
-//         }
-//         const userData = await User.findById({ _id : id  })
-//         console.log(userData)
-//         if (userData) {
-//             res.render('addCart', {  userData })
-//         } else {
-//             res.redirect('/login')
-//         }
-
-//     } catch (error) {
-//         console.log(error.message)
-//     }
-// }
 
 const loadCart = async (req, res) => {
     try {
         const id = req.session.userId;
 
         if (!id) {
-            
+
             return res.redirect('/login');
         }
 
@@ -432,9 +452,9 @@ const loadCart = async (req, res) => {
 
         // Fetch cart data
         const cartData = await Cart.findOne({ userId: id }).populate('products.productId');
-        
+
         if (userData && cartData) {
-            res.render('addCart', { userData, cartData }); 
+            res.render('addCart', { userData, cartData });
         } else {
             res.redirect('/login');
         }
@@ -489,6 +509,7 @@ const loadCart = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
+
         const id = req.session.userId;
         const productId = req.query.id;
         const quantity = parseInt(req.body.quantity);
@@ -596,15 +617,15 @@ const deleteCart = async (req, res) => {
 const loadUserProfile = async (req, res) => {
     try {
         const userId = req.session.userId
-        const orderId =req.query._id
+        const orderId = req.query._id
         console.log(req.session.userId)
         const user = await User.findById(userId)
-        const orderData = await Orders.find({userId : userId}).sort({orderDate:-1})
+        const orderData = await Orders.find({ userId: userId }).sort({ orderDate: -1 })
         // const orderData = await Orders.find({}).populate('userId').sort({orderDate :-1})
         console.log(orderData)
         if (user) {
-            
-            res.render('userProfile', { user,orderData,orderId })
+
+            res.render('userProfile', { user, orderData, orderId, formatedCouponDate })
         } else {
             res.redirect('/home')
         }
@@ -616,7 +637,7 @@ const loadUserProfile = async (req, res) => {
 // Load Address...
 const loadAddress = async (req, res) => {
     try {
-        res.render('addAddress',{message:""})
+        res.render('addAddress', { message: "" })
     } catch (error) {
         console.log(error.message)
     }
@@ -662,17 +683,17 @@ const addAddress = async (req, res) => {
     }
 }
 
-const loadEditAddress = async(req, res)=>{
+const loadEditAddress = async (req, res) => {
     try {
         const userId = req.session.userId;
         const index = req.query.index;
         const checkout = req.query.checkout;
-        
+
 
         const userData = await User.findById(userId);
         const address = userData.address[index]
 
-        res.render('editAddress',{ userData,address,index,checkout})
+        res.render('editAddress', { userData, address, index, checkout })
 
 
     } catch (error) {
@@ -688,7 +709,7 @@ const updateAddress = async (req, res) => {
         const userId = req.session.userId;
         const index = req.body.index;
         const checkout = req.body.checkout;
-        const {fname,
+        const { fname,
             lname,
             country,
             houseName,
@@ -696,10 +717,10 @@ const updateAddress = async (req, res) => {
             state,
             pincode,
             phone,
-            email} = req.body
-         const userData = await User.findById(userId)  
-         
-         userData.address[index] = {
+            email } = req.body
+        const userData = await User.findById(userId)
+
+        userData.address[index] = {
             fname,
             lname,
             country,
@@ -709,11 +730,11 @@ const updateAddress = async (req, res) => {
             pincode,
             phone,
             email
-         }
+        }
 
-         await userData.save();
+        await userData.save();
 
-         if (checkout) {
+        if (checkout) {
             res.redirect('/checkout');
         } else {
             res.redirect('/userProfile');
@@ -732,7 +753,7 @@ const loadCheckout = async (req, res) => {
         const userId = req.session.userId;
         console.log(userId)
         const user = await User.findById(userId)
-        const cart = await Cart.findOne({ userId}).populate('products.productId')
+        const cart = await Cart.findOne({ userId }).populate('products.productId')
         const coupon = await Coupon.find({
             is_active: true,
             expiry: { $gt: currentDate }, // Find coupons with expiry less than or equal to the current date
@@ -741,7 +762,7 @@ const loadCheckout = async (req, res) => {
 
 
         console.log(user)
-        res.render('checkout',{user, cart, subtotal , coupon , message:""})
+        res.render('checkout', { user, cart, subtotal, coupon, message: "" })
     } catch (error) {
         console.log(error.message)
     }
@@ -795,45 +816,45 @@ let applyCoupon = async (req, res) => {
         const couponCode = req.query.couponCode;
         const totalAmount = req.query.totalAmount;
         console.log(totalAmount)
-        const couponData = await Coupon.findOne({couponCode : couponCode})
-        if(!couponData){
-           return res.json({
-                message:'invalid Coupon',
-                finalPrice : totalAmount
+        const couponData = await Coupon.findOne({ couponCode: couponCode })
+        if (!couponData) {
+            return res.json({
+                message: 'invalid Coupon',
+                finalPrice: totalAmount
             })
         }
 
         const userData = await User.findById(userId);
         const isRedeemed = couponData.redeemUsers.some(user => user.userId === userData._id.toString());
-        if(isRedeemed || totalAmount<couponData.minPurchase){
+        if (isRedeemed || totalAmount < couponData.minPurchase) {
             return res.status(200).json({
-                message:'coupon already used',  
-                finalPrice :  totalAmount
-              
+                message: 'coupon already used',
+                finalPrice: totalAmount
+
             })
-           
-        }else{
+
+        } else {
 
 
             const finalPrice = totalAmount - couponData.discountAmount;
             console.log(finalPrice)
-            console.log('couponData:',couponData.discountAmount)
+            console.log('couponData:', couponData.discountAmount)
             const discountAmount = couponData.discountAmount
-            console.log('discountAmount',discountAmount)
+            console.log('discountAmount', discountAmount)
 
             res.status(200).json({
                 message: 'Coupon applied successfully',
                 finalPrice: finalPrice,
-                couponAmount : discountAmount
+                couponAmount: discountAmount
             });
-            
+
 
         }
 
     } catch (error) {
         console.log(error.messge)
     }
-      
+
 };
 
 
@@ -862,5 +883,6 @@ module.exports = {
     loadEditAddress,
     updateAddress,
     loadCheckout,
-    applyCoupon
+    applyCoupon,
+    formatedCouponDate
 }

@@ -889,7 +889,9 @@
                                 document.getElementById('couponAmount').innerHTML = data.couponAmount;
                                 document.getElementById('showCoupon').style.display = 'block';
                             }
-
+                            if(finalAmount < document.getElementById('walletBalance').value){
+                                document.getElementById('walletradio').style.display='block'
+                            }
 
                             })
                             .catch(error =>{
@@ -918,7 +920,7 @@
                         <a href="/addAddress" class="btn btn-fill-out submit" name="submit" value="Submit">Add Address</a>
                     </div>
                     <br>
-                    <form action="/placeOrder" method="post">
+                    <form action="/placeOrder" method="post" id="myForm">
                         <input type="hidden" id="coupon-selected" name="couponSelected">
                 <div class="row">
                     <div class="col-md-6">
@@ -990,7 +992,7 @@
                                                     <td colspan="2" class="product-subtotal text-info">
                                                         <span class="font-xl text-brand fw-900">₹</span><span id="finalAmount"><%=subtotal%></span>
                                                     </td>
-                                                   
+                                                    <% console.log('Subtotal:', subtotal); %>
                                                     <input type="hidden" name="totalAmount" id="totalAmount" value="<%=subtotal%>">
                                                    
                                                 </tr>
@@ -1010,37 +1012,91 @@
                                 </div>
                                 
                                 <div class="payment_method">
+                                    <div class="mb-25">
+                                        <h5>Payment</h5>
+                                    </div>
+                                
                                     <!-- Your payment options radio buttons -->
                                     <div class="custome-radio">
                                         <input class="form-check-input" required="" type="radio" name="paymentMethod" id="exampleRadios3" checked="" value="Cash On Delivery">
-                                        <label class="form-check-label" for="exampleRadios3" onclick="toggleButtons('cashOnDeliveryBtn', 'paypalBtn')">Cash On delivery</label>
+                                        <label class="form-check-label" for="exampleRadios3">Cash On delivery</label>
                                     </div>
                                 
                                     <div class="custome-radio">
                                         <input class="form-check-input" required="" type="radio" name="paymentMethod" id="exampleRadios4" value="Wallet">
-                                        <label class="form-check-label" for="exampleRadios4" onclick="toggleButtons('cashOnDeliveryBtn', 'paypalBtn')">Wallet</label>
+                                        <label class="form-check-label" for="exampleRadios4">Wallet</label>
                                     </div>
                                 
                                     <div class="custome-radio">
                                         <input class="form-check-input" required="" type="radio" name="paymentMethod" id="exampleRadios5" value="Paypal">
-                                        <label class="form-check-label" for="exampleRadios5" onclick="toggleButtons('paypalBtn', 'cashOnDeliveryBtn')">Paypal</label>
+                                        <label class="form-check-label" for="exampleRadios5">Paypal</label>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- <a href="#" class="btn btn-fill-out btn-block mt-30">Place Order</a> -->
-                            <%if(user.address.length>0){%>
-                                <button type="submit" id="cashOnDeliveryBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30">Place Order</button>
-                            <button type="submit" id="paypalBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30" style="display: none;">Place Order</button>
+                                
+                                <% if(user.address.length > 0) { %>
+                                    <button type="submit" id="cashOnDeliveryBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30">Place Order(COD)</button>
+                                    <button type="submit" id="paypalBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30" style="display: none;">Place Order(PAYPAL)</button>
+                                    <button id="walletBtn" class="btn btn-fill-out btn-block mt-30" style="display: none;" onclick="navigateToCheckWallet(event)">Pay wallet</button>
+                                <% } %>
+                                
+                                <div id="messageContainer"></div>
+                                <!-- <script>
+                                    function navigateToCheckWallet(event) {
+                                        event.preventDefault(); // Add parentheses here
+                                        window.location.href = "/checkWallet";
+                                    }
+                                </script> -->
+                                <!-- <script>
+                                    function navigateToCheckWallet(event) {
+                                        event.preventDefault(); // Add parentheses here
 
-                            <%}%>
-                           
+
+                                        fetch(`/checkWallet?totalAmount=${totalAmount}&addressIndex=${addressIndex}`)
+                                        
+                                       
+                                    }
+                                   
+                                    
+                                </script> -->
+                                <script>
+                                    function navigateToCheckWallet(event) {
+                                        event.preventDefault();
+                                       
+                                        const totalAmount = document.getElementById('totalAmount').value;
+                                        const addressIndex = document.getElementById('addressIndex').value;
+                                
+                                        fetch(`/checkWallet?totalAmount=${totalAmount}&addressIndex=${addressIndex}`)
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                if (data.message === 'insufficient balance') {
+                                                    // Display your insufficient balance message here
+                                                    console.log('Insufficient balance. Cannot proceed with wallet payment.');
+                                                } else {
+                                                    // Redirect to wallet payment or perform other actions
+                                                    console.log('Sufficient balance. Redirecting to wallet payment.');
+                                                    window.location.href = `/walletPayment?addressIndex=${addressIndex}&totalAmount=${totalAmount}`;
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error('Error checking wallet:', error);
+                                            });
+                                    }
+                                </script>
+                                
                             
                         </div>
                     </div>
                 </div>
             </form>
-           
+            <!-- <script>
+                document.getElementById('walletBtn').addEventListener('click', function () {
+                    // Set the form action to the specific route for wallet payment
+                    document.getElementById('myForm').action = "/walletRoute";
+                });
+            
+                // Add similar event listeners for other buttons if needed
+            </script> -->
+            In this example, I'
             </div>
         </section>
     </main>
@@ -1095,9 +1151,9 @@ function initiatePayment(razorOrder){
         "key": "rzp_test_FZSCAodZWexg9U", // Enter the Key ID generated from the Dashboard
         "amount": razorOrder.amount*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         "currency": "INR",
-        "name": "Acme Corp",
+        "name": "CHASHMA",
         "description": "Test Transaction",
-        "image": "https://example.com/your_logo",
+        "image": "assets/imgs/theme/chashma.png",
         "order_id": orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
         "handler": function (response){
             // alert(response.razorpay_payment_id);
@@ -1108,7 +1164,7 @@ function initiatePayment(razorOrder){
         },
         
         "theme": {
-            "color": "#3399cc"
+            "color": "#33cc99"
         }
     };
     var rzp1 = new Razorpay(options);
@@ -1138,35 +1194,45 @@ function initiatePayment(razorOrder){
   
     </script>
 
-<script>
-    function toggleButtons(showBtnId, hideBtnId) {
-        const showBtn = document.getElementById(showBtnId);
-        const hideBtn = document.getElementById(hideBtnId);
+    <script>
+        function toggleButtons(showBtnId, hideBtnId1, hideBtnId2) {
+            const showBtn = document.getElementById(showBtnId);
+            const hideBtn1 = document.getElementById(hideBtnId1);
+            const hideBtn2 = document.getElementById(hideBtnId2);
     
-        if (showBtn && hideBtn) {
-            showBtn.style.display = 'block';
-            hideBtn.style.display = 'none';
+            if (showBtn && hideBtn1 && hideBtn2) {
+                // Display the button that should be shown
+                showBtn.style.display = 'block';
+    
+                // Hide the other buttons
+                hideBtn1.style.display = 'none';
+                hideBtn2.style.display = 'none';
+            }
         }
-    }
     
-    // Initialize button visibility based on the initially checked radio button
-    document.addEventListener('DOMContentLoaded', function () {
-        const cashOnDeliveryBtn = document.getElementById('cashOnDeliveryBtn');
-        const paypalBtn = document.getElementById('paypalBtn');
+        // Initialize button visibility based on the initially checked radio button
+        document.addEventListener('DOMContentLoaded', function () {
+            const cashOnDeliveryBtn = document.getElementById('cashOnDeliveryBtn');
+            const paypalBtn = document.getElementById('paypalBtn');
+            const walletBtn = document.getElementById('walletBtn');
     
-        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-        
-        if (selectedPaymentMethod && selectedPaymentMethod.value === 'Cash On Delivery') {
-            // Show Cash On Delivery button
-            cashOnDeliveryBtn.style.display = 'block';
-            paypalBtn.style.display = 'none';
-        } else {
-            // Show Paypal button
-            cashOnDeliveryBtn.style.display = 'none';
-            paypalBtn.style.display = 'block';
-        }
-    });
+            const paymentMethodRadioButtons = document.getElementsByName('paymentMethod');
     
+            // Add event listener to each radio button
+            paymentMethodRadioButtons.forEach(function (radioButton) {
+                radioButton.addEventListener('click', function () {
+                    const paymentMethodValue = this.value;
+    
+                    if (paymentMethodValue === 'Cash On Delivery') {
+                        toggleButtons('cashOnDeliveryBtn', 'paypalBtn', 'walletBtn');
+                    } else if (paymentMethodValue === 'Wallet') {
+                        toggleButtons('walletBtn', 'cashOnDeliveryBtn', 'paypalBtn');
+                    } else {
+                        toggleButtons('paypalBtn', 'cashOnDeliveryBtn', 'walletBtn');
+                    }
+                });
+            });
+        });
     </script>
 
   

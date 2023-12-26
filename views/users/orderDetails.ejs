@@ -110,12 +110,43 @@
                             <small class="text-muted">Order ID: <%=orders.orderId%></small>
                         </div>
                         
-                        <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                        <!-- <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                             <% if (orders.OrderStatus !== 'Cancelled') { %>
                                 <button class="btn btn-primary" onclick="sweet('<%= orders._id %>')" id="cancelOrderBtn">Cancel Order</button>
                                 <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
                             <% } %>
+                        </div> -->
+                        <!-- <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                            <% if (orders.OrderStatus !== 'Cancelled') { %>
+                                <% if (orders.OrderStatus === 'Delivered') { %>
+                                    <button class="btn btn-warning" onclick="sweetReturn('<%= orders._id %>')" id="returnOrderBtn">Return Order</button>
+                                <% } else { %>
+                                    <button class="btn btn-primary" onclick="sweet('<%= orders._id %>')" id="cancelOrderBtn">Cancel Order</button>
+                                <% } %>
+                                <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                            <% } %>
+                        </div> -->
+                        <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                            <% if (orders.OrderStatus !== 'Order Cancelled') { %>
+                                <% if (orders.OrderStatus === 'Delivered') { %>
+                                    <button class="btn btn-warning" onclick="sweetReturn('<%= orders._id %>')" id="returnOrderBtn">Return Order</button>
+                                <% } else { %>
+                                    <button class="btn btn-primary" onclick="sweet('<%= orders._id %>')" id="cancelOrderBtn">Cancel Order</button>
+                                <% } %>
+                                <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                            <% } %>
                         </div>
+                        
+                        <script>
+                            // Assuming you have a way to get the current order status dynamically
+                            var currentOrderStatus = '<%= orders.OrderStatus %>';
+                        
+                            // Check if the order status is 'Order Cancelled' and hide the 'Cancel Order' button
+                            if (currentOrderStatus === 'Order Cancelled') {
+                                document.getElementById('cancelOrderBtn').style.display = 'none';
+                            }
+                        </script>
+                        
                         
                     </div>
                 </header> <!-- card-header end// -->
@@ -139,6 +170,32 @@
                                     if (res.isConfirmed) {
                                         // Redirect to cancelOrder route with orderId as a parameter
                                         window.location.href = `/cancelOrder?id=${orderId}`;
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+
+                    function sweetReturn(orderId) {
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "You want to Return the Order!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes, Return Order!"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire({
+                                    title: "Returned!",
+                                    text: "Order has been Returned.",
+                                    icon: "success"
+                                }).then((res) => {
+                                    if (res.isConfirmed) {
+                                        // Redirect to cancelOrder route with orderId as a parameter
+                                        window.location.href = `/returnOrder?id=${orderId}`;
                                     }
                                 });
                             }
@@ -171,7 +228,7 @@
                                     <h6 class="mb-1">Order info</h6>
                                     <p class="mb-1">
                                         Free Shipping <br><%= orders.paymentMethod %><br>Status:
-                                        <span class="<%= orders.OrderStatus === 'Cancelled' ? 'badge rounded-pill alert-danger' : 'badge rounded-pill alert-success' %>" style="font-size: 1em;">
+                                        <span class="<%= orders.OrderStatus === 'Cancelled'|| orders.OrderStatus == 'Returned' ? 'badge rounded-pill alert-danger' : 'badge rounded-pill alert-success' %>" style="font-size: 1em;">
                                             <%= orders.OrderStatus %>
                                         </span>
                                     </p>

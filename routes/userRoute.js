@@ -46,15 +46,24 @@ const orderController = require('../controllers/orderController')
 
 user_route.post('/placeOrder', orderController.placeOrder);
 user_route.get('/orderDetails', orderController.loadOrderDetails);
-user_route.get('/cancelOrder', orderController.cancelOrder)
+user_route.get('/cancelOrder', orderController.cancelOrder);
+user_route.get('/returnOrder',orderController.returnOrder);
 user_route.post('/onlinePayment',orderController.onlinePayment);
 user_route.get('/onlinePayment', orderController.paymentSuccess);
+user_route.get('/checkWallet', orderController.checkWallet);
+user_route.get('/walletPayment', orderController.walletPayment);
 
 
-//......................................COUPON CONTROLLER.............................................
 
+//......................................WISHLIST CONTROLLER.............................................
 
+const wishlistController = require('../controllers/wishlistContoller')
 
+user_route.get('/wishlist',wishlistController.loadWishlist);
+user_route.get('/addToWishlist',wishlistController.addToWishlist);
+user_route.post('/wishlist/addCart',wishlistController.addToCart);
+user_route.get('/deleteWishlist',wishlistController.deleteWishlist)
+ 
 
 module.exports = user_route;
 

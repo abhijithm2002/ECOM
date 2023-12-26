@@ -45,5 +45,8 @@ app.use('/', userRoute)
 const adminRoute = require('./routes/adminRoute');
 app.use('/admin', adminRoute)
 
-port = 8000;
-app.listen(port,()=>{console.log('server started in http://localhost:8000')})
+const port = process.env.PORT || 8000;
+
+app.listen(port, () => {
+    console.log(`Server started at http://localhost:${port}`);
+});

@@ -1,5 +1,5 @@
 const Coupon = require('../models/couponModel');
-const Category  = require('../models/categoryModel');
+const Category = require('../models/categoryModel');
 const Orders = require('../models/ordersModel');
 const User = require('../models/userModel');
 const Cart = require('../models/cartModel')
@@ -8,30 +8,31 @@ const moment = require('moment')
 const cron = require('node-cron');
 
 const formatedCouponDate = (date) => {
-    return moment(date).format('MMMM DD, YYYY'); 
+    return moment(date).format('MMMM DD, YYYY hh:mm A');
+
 };
 
-const loadCoupon = async(req, res)=>{
+const loadCoupon = async (req, res) => {
     try {
         const coupon = await Coupon.find()
-        res.render('coupon',{coupon, message:'', formatedCouponDate })
+        res.render('coupon', { coupon, message: '', formatedCouponDate })
     } catch (error) {
         console.log(error.message)
     }
 }
 
-const addCoupon = async(req, res)=>{
+const addCoupon = async (req, res) => {
     try {
-        
+
         const coupon = new Coupon({
-            couponCode : req.body.couponCode,
-            discountAmount : req.body.discountAmount,
-            minPurchase : req.body.minPurchase,
-            expiry : req.body.expiry,
-            is_active : true
+            couponCode: req.body.couponCode,
+            discountAmount: req.body.discountAmount,
+            minPurchase: req.body.minPurchase,
+            expiry: req.body.expiry,
+            is_active: true
         })
 
-         await coupon.save()
+        await coupon.save()
         res.redirect('/admin/coupon')
 
     } catch (error) {
@@ -53,17 +54,17 @@ const couponAction = async (req, res) => {
             );
 
             if (couponData) {
-               
+
                 const coupon = await Coupon.find({});
-                res.render('coupon', { coupon: coupon ,message:'' });
+                res.render('coupon', { coupon: coupon, message: '' });
             } else {
                 console.log('User not found or update failed');
-           
+
                 res.status(404).send('User not found or update failed');
             }
         } else {
             console.log('Invalid act parameter');
-            
+
             res.status(400).send('Invalid act parameter');
         }
 
@@ -72,10 +73,10 @@ const couponAction = async (req, res) => {
     }
 }
 
-const deleteCoupon = async(req, res)=>{
+const deleteCoupon = async (req, res) => {
     try {
         id = req.query.id;
-        await Coupon.deleteOne({_id : id});
+        await Coupon.deleteOne({ _id: id });
         res.redirect('/admin/coupon');
 
     } catch (error) {
@@ -104,7 +105,7 @@ const deleteCoupon = async(req, res)=>{
 //     console.log('Running a task every minute');
 //   });
 
-module.exports ={
+module.exports = {
     loadCoupon,
     addCoupon,
     couponAction,

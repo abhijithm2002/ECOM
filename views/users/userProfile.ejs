@@ -468,6 +468,9 @@
                                             <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
                                         </li>
                                         <li class="nav-item">
+                                            <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="true"><i class="fi-rs-user mr-10"></i>Wallet</a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
                                         </li>
                                     </ul>
@@ -513,7 +516,7 @@
                                                             <tr>
                                                                 
                                                                 <td><%=orderData[i].orderId%></td>
-                                                                <td><%=orderData[i].orderDate%></td>
+                                                                <td><%= formatedCouponDate(orderData[i].orderDate)%></td>
                                                                 <!-- <td><%=orderData[i].OrderStatus%></td> -->
                                                                 <td>
                                                                     <span class="badge rounded-pill alert-success"><%=orderData[i].OrderStatus%></span>
@@ -629,6 +632,14 @@
                                                     </div>
                                                     
                                                 </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade " id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h4>Wallet Balance</h4><br>
+                                                <h5><%= user.wallet%></h5>
                                             </div>
                                         </div>
                                     </div>

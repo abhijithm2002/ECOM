@@ -53,10 +53,6 @@ const productSchema = new mongoose.Schema({
         type:String,
 
     }],
-    category:{
-        type:String,
-        
-    },
     gender:{
         type:String,
         required:true
@@ -68,7 +64,16 @@ const productSchema = new mongoose.Schema({
     is_active:{
         type:Boolean,
         default:true
-    }
+    },
+    date:{
+        type: Date,
+        default : Date.now()
+    },
+        
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+    },
 })
 
 const Product = mongoose.model('Product',productSchema)

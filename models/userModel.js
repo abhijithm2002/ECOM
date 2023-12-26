@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
         ref : 'Cart',
        
     },
+    date:{
+        type: Date,
+        default : Date.now()
+    },
     address :[{
         fname:{
             type : String
@@ -64,7 +68,11 @@ const userSchema = new mongoose.Schema({
         email:{
             type:String
         }
-    }]
+    }],
+    wallet:{
+        type:Number,
+        default:0
+    }
     
 })
 

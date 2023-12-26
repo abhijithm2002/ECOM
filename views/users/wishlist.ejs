@@ -2,8 +2,7 @@
 <html class="no-js" lang="en">
 
 
-<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-product-full.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:46 GMT -->
-
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-wishlist.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:05 GMT -->
 <head>
     <meta charset="utf-8">
     <title>CHASHMA</title>
@@ -18,13 +17,10 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/toplogo.jpeg">
     <!-- Template CSS -->
     <link rel="stylesheet" href="assets/css/maind134.css?v=3.4">
-
-    <link rel="stylesheet" href="assets/js/magiczoom.css">
-    <script src="assets/js/magiczoom.js"></script>
 </head>
 
 <body>
-    <!-- Modal -->
+     <!-- Modal -->
    
 
     <!-- Quick view -->
@@ -207,7 +203,7 @@
                     </div>
                     <div class="header-right">
                         <div class="search-style-2">
-                            <form action="#">
+                            <form action="/wishlist">
                                 <select class="select-active">
                                     <option>All Categories</option>
                                     <option>Women's</option>
@@ -221,21 +217,21 @@
                                     <option>Shoes</option>
                                     <option>Mother & Kids</option>
                                 </select>
-                                <input type="text" placeholder="Search for items...">
+                                <input type="text" name="search" placeholder="Search for items...">
                             </form>
                         </div>
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
-                                    <a href="shop-wishlist.html">
+                                    <a href="/wishlist">
                                         <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
-                                        <span class="pro-count blue">4</span>
+                                        <span class="pro-count blue"></span>
                                     </a>
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a class="mini-cart-icon" href="/addCart?id=<%=product._id%>">
+                                    <a class="mini-cart-icon" href="/addCart>">
                                         <img alt="Evara" src="assets/imgs/theme/icons/icon-cart.svg">
-                                        <span class="pro-count blue">2</span>
+                                        <span class="pro-count blue"></span>
                                     </a>
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2">
                                         <ul>
@@ -563,607 +559,83 @@
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="/home" rel="nofollow">Home</a>
-                    <span></span> Fashion
-                    <span></span> Abstract Print Patchwork Dress
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Wishlist
                 </div>
             </div>
         </div>
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row">
-                    <form action="/addCart?id=<%=product._id%>" method="post">
-                        <div class="col-lg-12">
-                            <div class="product-detail accordion-detail">
-                                <div class="row mb-50">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col" colspan="2">Product</th>
+                                        <th scope="col">Price</th>
+                                        <!-- <th scope="col">Stock Status</th> -->
+                                        <th scope="col">Action</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody>
+                                    <% if (wishlist && wishlist.products.length > 0) { %>
+                                        <% wishlist.products.forEach(product => { %>
+                                            <form action="/wishlist/addCart?id=<%=product.productId._id%>" method="post">
+                                    <tr>
+                                        <td class="image product-thumbnail"><img src="<%= product.productId.image[0] %>" alt="#"></td>
+                                        <td class="product-des product-name">
+                                            <h5 class="product-name"><a href="shop-product-right.html"><%= product.productId.title %></a></h5>
+                                            
+                                        </td>
+                                        <td class="price" data-title="Price"><span><%= product.productId.promoPrice %></span></td>
+                                        <!-- <td class="text-center" data-title="Stock">
+                                            <span class="color3 font-weight-bold">In Stock</span>
+                                        </td> -->
+                                        <td class="text-right" data-title="Cart">
+                                           
+                                            <!-- <button class="btn btn-sm" ><i class="fi-rs-shopping-bag mr-5"  ></i>Add to cart</button> -->
+                                            <a href="/wishlist/addCart?id=<%=product.productId._id%>">
+                                                <button class="btn btn-sm" >
+                                                  <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
+                                                </button>
+                                              </a>
+                                              
+                                        </td>
+                                        <td class="action" data-title="Remove"><a href="/deleteWishlist?id=<%= product._id %>"><i class="fi-rs-trash"></i></a></td>
+                                    </tr>
+                                    <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="4" class="text-danger">No products in the wishlist</td>
+                                        </tr>
+                                    <% } %>
 
-                                    <div class="col-md-6 col-sm-12 col-xs-12">
-
-                                        <div class="detail-gallery">
-                                            <span class="zoom-icon"><i class="fi-rs-search"></i></span>
-                                            <!-- MAIN SLIDES -->
-
-
-                                            <div class="product-image-slider">
-                                                <%for(let i=0; i<product.image.length;i++){%> 
-                                                    <figure class="border-radius-10">
-                                                        <a href="/<%= product.image[i] %>" class="MagicZoom">
-                                                         <img src="/<%= product.image[i] %>" alt="product image">
-                                                        </a>
-                                                    </figure>
-
-                                                     <%}%>
-                                            </div>
-                                            <!-- THUMBNAILS -->
-                                            <div class="slider-nav-thumbnails pl-15 pr-15">
-                                                <%for(let i=0; i<product.image.length;i++){%> 
-                                                    <div><img src="/<%= product.image[i] %>" alt="product image"></div>
-                                                     <%}%>
-
-                                            </div>
-                                        </div>
-                                        <!-- End Gallery -->
-
-                                    </div>
-                                    <div class="col-md-6 col-sm-12 col-xs-12">
-
-                                        <div class="detail-info">
-
-                                            <h2 class="title-detail">
-                                                <%=product.title%>
-                                            </h2>
-                                            <div class="product-detail-rating">
-                                                <div class="pro-details-brand">
-                                                    <span> Brands: <a href="shop-grid-right.html">
-                                                            <%=product.brand%>
-                                                        </a></span>
-                                                </div>
-                                                <div class="product-rate-cover text-end">
-                                                    <div class="product-rate d-inline-block">
-                                                        <div class="product-rating" style="width:90%">
-                                                        </div>
-                                                    </div>
-                                                    <span class="font-small ml-5 text-muted"> (25 reviews)</span>
-                                                </div>
-                                            </div>
-                                            <div class="clearfix product-price-cover">
-                                                <div class="product-price primary-color float-left">
-                                                    <ins><span class="text-brand">₹<%=product.promoPrice%></span></ins>
-                                                    <ins><span class="old-price font-md ml-15">₹
-                                                            <%=product.regularPrice%>
-                                                        </span></ins>
-                                                    <span class="save-price  font-md color3 ml-15">25% Off</span>
-                                                </div>
-                                            </div>
-                                            <div class="bt-1 border-color-1 mt-15 mb-15"></div>
-
-                                            <div class="short-desc mb-30">
-                                                <p><%=product.description%></p>
-                                            </div>
-
-                                            <div class="product_sort_info font-xs mb-30">
-                                                <ul>
-                                                    <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year 
-                                                        Brand Warranty</li>
-                                                    <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return
-                                                        Policy</li>
-                                                    <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery
-                                                        available</li>
-                                                </ul>
-                                            </div>
-                                            <!-- <div class="attr-detail attr-color mb-15">
-                                            <strong class="mr-10">Color</strong>
-                                            <ul class="list-filter color-filter">
-                                                <li><a href="#" data-color="Red"><span class="product-color-red"></span></a></li>
-                                                <li><a href="#" data-color="Yellow"><span class="product-color-yellow"></span></a></li>
-                                                <li class="active"><a href="#" data-color="White"><span class="product-color-white"></span></a></li>
-                                                <li><a href="#" data-color="Orange"><span class="product-color-orange"></span></a></li>
-                                                <li><a href="#" data-color="Cyan"><span class="product-color-cyan"></span></a></li>
-                                                <li><a href="#" data-color="Green"><span class="product-color-green"></span></a></li>
-                                                <li><a href="#" data-color="Purple"><span class="product-color-purple"></span></a></li>
-                                            </ul>
-                                        </div> -->
-                                            <!-- <div class="attr-detail attr-size">
-                                            <strong class="mr-10">Size</strong>
-                                            <ul class="list-filter size-filter font-small">
-                                                <li><a href="#">S</a></li>
-                                                <li class="active"><a href="#">M</a></li>
-                                                <li><a href="#">L</a></li>
-                                                <li><a href="#">XL</a></li>
-                                                <li><a href="#">XXL</a></li>
-                                            </ul>
-                                        </div> -->
-
-                                            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-
-                                            <!-- <div class="detail-extralink">
-                                            <div class="detail-qty border radius">
-                                                <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                                                <span class="qty-val">1</span>
-                                                <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
-                                            </div>
-                                            <div class="product-extra-link2">
-                                               
-                                                <button type="submit" class="button button-add-to-cart" >Add to cart</button>
-                                                
-                                                
-
-                                                                                                                                                                                         
-                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                                <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
-                                            </div>
-                                        </div> -->
-                                            <div class="detail-extralink">
-                                                <div class="detail-qty border radius">
-                                                    <a href="#" class="qty-down" onclick="updateQuantity(-1)"><i
-                                                            class="fi-rs-angle-small-down"></i></a>
-                                                            <input hidden type="text" value="1" id="quantityInput" name="quantity">
-                                                    <span class="qty-val" id="quantity">1</span>
-                                                    <a href="#" class="qty-up" onclick="updateQuantity(1)"><i
-                                                            class="fi-rs-angle-small-up"></i></a>
-                                                </div>
-
-                                                <script>
-                                                    let currentQuantity = 1;
-
-                                                    function updateQuantity(amount) {
-                                                        currentQuantity += amount;
-                                                        if (currentQuantity < 1) {
-                                                            currentQuantity = 1;
-                                                        }
-                                                        document.getElementById('quantity').innerText = currentQuantity;
-
-                                                        // Update the hidden input field value
-                                                        document.getElementById('quantityInput').value = currentQuantity;
-                                                    }
-                                                </script>
-                                               
-                                                
-                                                <div class="product-extra-link2">
-                                                    <button type="submit" class="button button-add-to-cart"
-                                                        >Add to cart</button>
-                                                        <!-- <button type="submit" id="addToCartButton" class="button button-add-to-cart">Add to cart</button>
-                                                        <p id="outOfStockMessage" style="display: none; color: red;">Out of stock</p> -->
-
-                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up"
-                                                        href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                                    <a aria-label="Compare" class="action-btn hover-up"
-                                                        href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
-                                                </div>
-                                            </div>
-
-
-                                            <ul class="product-meta font-xs color-grey mt-50">
-                                                <!-- <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li> -->
-                                                <li class="mb-5">Tags: <a href="#" rel="tag">
-                                                        <%=product.tags%>
-                                                    </a> </li>
-                                                <li>Availability:<span class="in-stock text-success ml-5">
-                                                        <%=product.quantity%> items in Stock
-                                                    </span></li>
-                                            </ul>
-                                        </div>
-
-                                        <!-- Detail Info -->
-
-                                    </div>
-                                </div>
-                               
-                                <div class="row">
-                                    <div class="col-lg-10 m-auto entry-main-content">
-                                        <h2 class="section-title style-1 mb-30">Description</h2>
-                                        <div class="description mb-50">
-                                            <p>
-                                                <%=product.description%>
-                                            </p>
-
-
-                                            <hr class="wp-block-separator is-style-dots">
-
-                                            <!-- <h4 class="mt-30">Packaging & Delivery</h4>
-                                        <hr class="wp-block-separator is-style-wide">
-                                        <p>Less lion goodness that euphemistically robin expeditiously bluebird smugly scratched far while thus cackled sheepishly rigid after due one assenting regarding censorious while occasional or this more crane
-                                            went more as this less much amid overhung anathematic because much held one exuberantly sheep goodness so where rat wry well concomitantly.
-                                        </p>
-                                        <p>Scallop or far crud plain remarkably far by thus far iguana lewd precociously and and less rattlesnake contrary caustic wow this near alas and next and pled the yikes articulate about as less cackled dalmatian
-                                            in much less well jeering for the thanks blindly sentimental whimpered less across objectively fanciful grimaced wildly some wow and rose jeepers outgrew lugubrious luridly irrationally attractively
-                                            dachshund.
-                                        </p> -->
-                                        </div>
-                                        <h3 class="section-title style-1 mb-30">Additional info</h3>
-                                        <table class="font-md mb-30">
-                                            <tbody>
-                                                <tr class="stand-up">
-                                                    <th>Frame Material</th>
-                                                    <td>
-                                                        <p>
-                                                            <%=product.frameMaterial%>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="folded-wo-wheels">
-                                                    <th>Frame Colour</th>
-                                                    <td>
-                                                        <p>
-                                                            <%=product.frameColour%>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="folded-w-wheels">
-                                                    <th>Style</th>
-                                                    <td>
-                                                        <p>
-                                                            <%=product.style%>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="door-pass-through">
-                                                    <th>Temple Colour</th>
-                                                    <td>
-                                                        <p>
-                                                            <%=product.templeColour%>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="frame">
-                                                    <th>Lens Technology</th>
-                                                    <td>
-                                                        <p>
-                                                            <%=product.lensTechnology%>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                                <tr class="weight-wo-wheels">
-                                                    <th>Lens Colour</th>
-                                                    <td>
-                                                        <p>
-                                                            <%=product.lensColour%>
-                                                        </p>
-                                                    </td>
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
-                    </form>
-
-
-                    <div class="social-icons single-share">
-                        <ul class="text-grey-5 d-inline-block">
-                            <li><strong class="mr-10">Share this:</strong></li>
-                            <li class="social-facebook"><a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg"
-                                        alt=""></a></li>
-                            <li class="social-twitter"> <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg"
-                                        alt=""></a></li>
-                            <li class="social-instagram"><a href="#"><img
-                                        src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a></li>
-                            <li class="social-linkedin"><a href="#"><img
-                                        src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a></li>
-                        </ul>
-                    </div>
-                    <h3 class="section-title style-1 mb-30 mt-30">Reviews (3)</h3>
-                    <!--Comments-->
-                    <div class="comments-area style-2">
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <h4 class="mb-30">Customer questions & answers</h4>
-                                <div class="comment-list">
-                                    <div class="single-comment justify-content-between d-flex">
-                                        <div class="user justify-content-between d-flex">
-                                            <div class="thumb text-center">
-                                                <img src="assets/imgs/page/avatar-6.jpg" alt="">
-                                                <h6><a href="#">Jacky Chan</a></h6>
-                                                <p class="font-xxs">Since 2012</p>
-                                            </div>
-                                            <div class="desc">
-                                                <div class="product-rate d-inline-block">
-                                                    <div class="product-rating" style="width:90%">
-                                                    </div>
-                                                </div>
-                                                <p>Thank you very fast shipping from Poland only 3days.</p>
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="d-flex align-items-center">
-                                                        <p class="font-xs mr-30">December 4, 2020 at 3:12 pm </p>
-                                                        <a href="#" class="text-brand btn-reply">Reply <i
-                                                                class="fi-rs-arrow-right"></i> </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!--single-comment -->
-                                    <div class="single-comment justify-content-between d-flex">
-                                        <div class="user justify-content-between d-flex">
-                                            <div class="thumb text-center">
-                                                <img src="assets/imgs/page/avatar-7.jpg" alt="">
-                                                <h6><a href="#">Ana Rosie</a></h6>
-                                                <p class="font-xxs">Since 2008</p>
-                                            </div>
-                                            <div class="desc">
-                                                <div class="product-rate d-inline-block">
-                                                    <div class="product-rating" style="width:90%">
-                                                    </div>
-                                                </div>
-                                                <p>Great low price and works well.</p>
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="d-flex align-items-center">
-                                                        <p class="font-xs mr-30">December 4, 2020 at 3:12 pm </p>
-                                                        <a href="#" class="text-brand btn-reply">Reply <i
-                                                                class="fi-rs-arrow-right"></i> </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!--single-comment -->
-                                    <div class="single-comment justify-content-between d-flex">
-                                        <div class="user justify-content-between d-flex">
-                                            <div class="thumb text-center">
-                                                <img src="assets/imgs/page/avatar-8.jpg" alt="">
-                                                <h6><a href="#">Steven Keny</a></h6>
-                                                <p class="font-xxs">Since 2010</p>
-                                            </div>
-                                            <div class="desc">
-                                                <div class="product-rate d-inline-block">
-                                                    <div class="product-rating" style="width:90%">
-                                                    </div>
-                                                </div>
-                                                <p>Authentic and Beautiful, Love these way more than ever expected They
-                                                    are Great earphones</p>
-                                                <div class="d-flex justify-content-between">
-                                                    <div class="d-flex align-items-center">
-                                                        <p class="font-xs mr-30">December 4, 2020 at 3:12 pm </p>
-                                                        <a href="#" class="text-brand btn-reply">Reply <i
-                                                                class="fi-rs-arrow-right"></i> </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!--single-comment -->
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <h4 class="mb-30">Customer reviews</h4>
-                                <div class="d-flex mb-30">
-                                    <div class="product-rate d-inline-block mr-15">
-                                        <div class="product-rating" style="width:90%">
-                                        </div>
-                                    </div>
-                                    <h6>4.8 out of 5</h6>
-                                </div>
-                                <div class="progress">
-                                    <span>5 star</span>
-                                    <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50"
-                                        aria-valuemin="0" aria-valuemax="100">50%</div>
-                                </div>
-                                <div class="progress">
-                                    <span>4 star</span>
-                                    <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25"
-                                        aria-valuemin="0" aria-valuemax="100">25%</div>
-                                </div>
-                                <div class="progress">
-                                    <span>3 star</span>
-                                    <div class="progress-bar" role="progressbar" style="width: 45%;" aria-valuenow="45"
-                                        aria-valuemin="0" aria-valuemax="100">45%</div>
-                                </div>
-                                <div class="progress">
-                                    <span>2 star</span>
-                                    <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65"
-                                        aria-valuemin="0" aria-valuemax="100">65%</div>
-                                </div>
-                                <div class="progress mb-30">
-                                    <span>1 star</span>
-                                    <div class="progress-bar" role="progressbar" style="width: 85%;" aria-valuenow="85"
-                                        aria-valuemin="0" aria-valuemax="100">85%</div>
-                                </div>
-                                <a href="#" class="font-xs text-muted">How are ratings calculated?</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!--comment form-->
-                    <div class="comment-form">
-                        <h4 class="mb-15">Add a review</h4>
-                        <div class="product-rate d-inline-block mb-30">
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-8 col-md-12">
-                                <form class="form-contact comment_form" action="#" id="commentForm">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="form-group">
-                                                <textarea class="form-control w-100" name="comment" id="comment"
-                                                    cols="30" rows="9" placeholder="Write Comment"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <input class="form-control" name="name" id="name" type="text"
-                                                    placeholder="Name">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <input class="form-control" name="email" id="email" type="email"
-                                                    placeholder="Email">
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="form-group">
-                                                <input class="form-control" name="website" id="website" type="text"
-                                                    placeholder="Website">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <button type="submit" class="button button-contactForm">Submit
-                                            Review</button>
-                                    </div>
                                 </form>
-                            </div>
+                                    <!-- <tr>
+                                        <td class="image"><img src="assets/imgs/shop/product-3-1.jpg" alt="#"></td>
+                                        <td class="product-des">
+                                            <h5 class="product-name"><a href="shop-product-right.html">Amazon Brand - Daily Ritual Women's Jersey </a></h5>
+                                            <p class="font-xs">Erat amet et et amet diam et et.<br> Justo amet at dolore
+                                            </p>
+                                        </td>
+                                        <td class="price" data-title="Price"><span>$62.00 </span></td>
+                                        <td class="text-center" data-title="Stock">
+                                            <span class="text-danger font-weight-bold">Out of stock</span>
+                                        </td>
+                                        <td class="text-right" data-title="Cart">
+                                            <button class="btn btn-sm btn-secondary"><i class="fi-rs-headset mr-5"></i>Contact Us</button>
+                                        </td>
+                                        <td class="action" data-title="Remove"><a href="#"><i class="fi-rs-trash"></i></a></td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                </form>
-            </div>
-            <div class="row mt-60">
-                <div class="col-12">
-                    <h3 class="section-title style-1 mb-30">Related products</h3>
-                </div>
-                <div class="col-12">
-                    <div class="row related-products">
-                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                            <div class="product-cart-wrap small hover-up">
-                                <div class="product-img-action-wrap">
-                                    <div class="product-img product-img-zoom">
-                                        <a href="shop-product-right.html" tabindex="0">
-                                            <img class="default-img" src="assets/imgs/shop/product-2-1.jpg" alt="">
-                                            <img class="hover-img" src="assets/imgs/shop/product-2-2.jpg" alt="">
-                                        </a>
-                                    </div>
-                                    <div class="product-action-1">
-                                        <a aria-label="Quick view" class="action-btn small hover-up"
-                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                        <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                            href="shop-wishlist.html" tabindex="0"><i class="fi-rs-heart"></i></a>
-                                        <a aria-label="Compare" class="action-btn small hover-up"
-                                            href="shop-compare.html" tabindex="0"><i class="fi-rs-shuffle"></i></a>
-                                    </div>
-                                    <div class="product-badges product-badges-position product-badges-mrg">
-                                        <span class="hot">Hot</span>
-                                    </div>
-                                </div>
-                                <div class="product-content-wrap">
-                                    <h2><a href="shop-product-right.html" tabindex="0">Ulstra Bass Headphone</a></h2>
-                                    <div class="rating-result" title="90%">
-                                        <span>
-                                        </span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span>$238.85 </span>
-                                        <span class="old-price">$245.8</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                            <div class="product-cart-wrap small hover-up">
-                                <div class="product-img-action-wrap">
-                                    <div class="product-img product-img-zoom">
-                                        <a href="shop-product-right.html" tabindex="0">
-                                            <img class="default-img" src="assets/imgs/shop/product-3-1.jpg" alt="">
-                                            <img class="hover-img" src="assets/imgs/shop/product-4-2.jpg" alt="">
-                                        </a>
-                                    </div>
-                                    <div class="product-action-1">
-                                        <a aria-label="Quick view" class="action-btn small hover-up"
-                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                        <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                            href="shop-wishlist.html" tabindex="0"><i class="fi-rs-heart"></i></a>
-                                        <a aria-label="Compare" class="action-btn small hover-up"
-                                            href="shop-compare.html" tabindex="0"><i class="fi-rs-shuffle"></i></a>
-                                    </div>
-                                    <div class="product-badges product-badges-position product-badges-mrg">
-                                        <span class="sale">-12%</span>
-                                    </div>
-                                </div>
-                                <div class="product-content-wrap">
-                                    <h2><a href="shop-product-right.html" tabindex="0">Smart Bluetooth Speaker</a></h2>
-                                    <div class="rating-result" title="90%">
-                                        <span>
-                                        </span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span>$138.85 </span>
-                                        <span class="old-price">$145.8</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                            <div class="product-cart-wrap small hover-up">
-                                <div class="product-img-action-wrap">
-                                    <div class="product-img product-img-zoom">
-                                        <a href="shop-product-right.html" tabindex="0">
-                                            <img class="default-img" src="assets/imgs/shop/product-4-1.jpg" alt="">
-                                            <img class="hover-img" src="assets/imgs/shop/product-4-2.jpg" alt="">
-                                        </a>
-                                    </div>
-                                    <div class="product-action-1">
-                                        <a aria-label="Quick view" class="action-btn small hover-up"
-                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                        <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                            href="shop-wishlist.html" tabindex="0"><i class="fi-rs-heart"></i></a>
-                                        <a aria-label="Compare" class="action-btn small hover-up"
-                                            href="shop-compare.html" tabindex="0"><i class="fi-rs-shuffle"></i></a>
-                                    </div>
-                                    <div class="product-badges product-badges-position product-badges-mrg">
-                                        <span class="new">New</span>
-                                    </div>
-                                </div>
-                                <div class="product-content-wrap">
-                                    <h2><a href="shop-product-right.html" tabindex="0">HomeSpeak 12UEA Goole</a></h2>
-                                    <div class="rating-result" title="90%">
-                                        <span>
-                                        </span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span>$738.85 </span>
-                                        <span class="old-price">$1245.8</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                            <div class="product-cart-wrap small hover-up mb-0">
-                                <div class="product-img-action-wrap">
-                                    <div class="product-img product-img-zoom">
-                                        <a href="shop-product-right.html" tabindex="0">
-                                            <img class="default-img" src="assets/imgs/shop/product-5-1.jpg" alt="">
-                                            <img class="hover-img" src="assets/imgs/shop/product-3-2.jpg" alt="">
-                                        </a>
-                                    </div>
-                                    <div class="product-action-1">
-                                        <a aria-label="Quick view" class="action-btn small hover-up"
-                                            data-bs-toggle="modal" data-bs-target="#quickViewModal
-"><i class="fi-rs-search"></i></a>
-                                        <a aria-label="Add To Wishlist" class="action-btn small hover-up"
-                                            href="shop-wishlist.html" tabindex="0"><i class="fi-rs-heart"></i></a>
-                                        <a aria-label="Compare" class="action-btn small hover-up"
-                                            href="shop-compare.html" tabindex="0"><i class="fi-rs-shuffle"></i></a>
-                                    </div>
-                                    <div class="product-badges product-badges-position product-badges-mrg">
-                                        <span class="hot">Hot</span>
-                                    </div>
-                                </div>
-                                <div class="product-content-wrap">
-                                    <h2><a href="shop-product-right.html" tabindex="0">Dadua Camera 4K 2022EF</a></h2>
-                                    <div class="rating-result" title="90%">
-                                        <span>
-                                        </span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span>$89.8 </span>
-                                        <span class="old-price">$98.8</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="banner-img banner-big wow fadeIn f-none animated mt-50">
-                <img class="border-radius-10" src="assets/imgs/banner/banner-4.png" alt="">
-                <div class="banner-text">
-                    <h4 class="mb-15 mt-40">Repair Services</h4>
-                    <h2 class="fw-600 mb-20">We're an Apple <br>Authorised Service Provider</h2>
-                </div>
-            </div>
-            </div>
-            </div>
-            </div>
             </div>
         </section>
     </main>
@@ -1178,8 +650,7 @@
                                 <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
                             </div>
                             <div class="col my-4 my-md-0 des">
-                                <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>$25 coupon for first
-                                        shopping.</strong></h5>
+                                <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>$25 coupon for first shopping.</strong></h5>
                             </div>
                         </div>
                     </div>
@@ -1200,7 +671,7 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="widget-about font-md mb-md-5 mb-lg-0">
                             <div class="logo logo-width-1 wow fadeIn animated">
-                                <a href="index.html"><img src="assets/imgs/theme/chashma.png" alt="logo"></a>
+                                <a href="index.html"><img src="assets/imgs/theme/logo.svg" alt="logo"></a>
                             </div>
                             <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
                             <p class="wow fadeIn animated">
@@ -1250,10 +721,8 @@
                             <div class="col-md-8 col-lg-12">
                                 <p class="wow fadeIn animated">From App Store or Google Play</p>
                                 <div class="download-app wow fadeIn animated">
-                                    <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active"
-                                            src="assets/imgs/theme/app-store.jpg" alt=""></a>
-                                    <a href="#" class="hover-up"><img src="assets/imgs/theme/google-play.jpg"
-                                            alt=""></a>
+                                    <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="assets/imgs/theme/app-store.jpg" alt=""></a>
+                                    <a href="#" class="hover-up"><img src="assets/imgs/theme/google-play.jpg" alt=""></a>
                                 </div>
                             </div>
                             <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
@@ -1271,13 +740,11 @@
                     <div class="footer-bottom"></div>
                 </div>
                 <div class="col-lg-6">
-                    <p class="float-md-left font-sm text-muted mb-0">&copy; 2022, <strong
-                            class="text-brand">Evara</strong> - HTML Ecommerce Template </p>
+                    <p class="float-md-left font-sm text-muted mb-0">&copy; 2022, <strong class="text-brand">Evara</strong> - HTML Ecommerce Template </p>
                 </div>
                 <div class="col-lg-6">
                     <p class="text-lg-end text-start font-sm text-muted mb-0">
-                        Designed by <a href="http://alithemes.com/" target="_blank">Alithemes.com</a>. All rights
-                        reserved
+                        Designed by <a href="http://alithemes.com/" target="_blank">Alithemes.com</a>. All rights reserved
                     </p>
                 </div>
             </div>
@@ -1317,14 +784,11 @@
     <script src="assets/js/plugins/isotope.js"></script>
     <script src="assets/js/plugins/scrollup.js"></script>
     <script src="assets/js/plugins/jquery.vticker-min.js"></script>
-    <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
-    <script src="assets/js/plugins/jquery.elevatezoom.js"></script>
     <!-- Template  JS -->
     <script src="assets/js/maind134.js?v=3.4"></script>
     <script src="assets/js/shopd134.js?v=3.4"></script>
 </body>
 
 
-<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-product-full.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:46 GMT -->
-
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/shop-wishlist.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:05 GMT -->
 </html>

@@ -17,8 +17,8 @@ const adminController = require('../controllers/adminController')
 
 
 admin_route.get('/', auth.isLogout, adminController.loadLogin);
-admin_route.post('/',  adminController.verifyLogin);
-admin_route.get('/dashboard', auth.isLogin, adminController.loadDashboard);
+admin_route.post('/', adminController.verifyLogin);
+
 admin_route.get('/userslist', auth.isLogin, adminController.newUserLoad);
 admin_route.get('/useraction', auth.isLogin, adminController.userAction);
 admin_route.get('/addCategory', auth.isLogin, adminController.loadCategory);
@@ -37,6 +37,7 @@ admin_route.get('/deleteProduct', auth.isLogin, adminController.deleteProduct);
 admin_route.get('/orderList', auth.isLogin, adminController.loadOrderList)
 admin_route.get('/orderDetails', adminController.loadOrderDetails)
 admin_route.post('/orderStatus', auth.isLogin, adminController.orderStatus);
+admin_route.get('/salesReport',auth.isLogin,adminController.loadSalesReport)
 
 
 
@@ -44,12 +45,18 @@ admin_route.post('/orderStatus', auth.isLogin, adminController.orderStatus);
 
 const couponController = require('../controllers/couponController')
 
-admin_route.get('/coupon',couponController.loadCoupon);
-admin_route.post('/coupon',couponController.addCoupon);
-admin_route.get('/couponaction',couponController.couponAction);
-admin_route.get('/deleteCoupon',couponController.deleteCoupon);
+admin_route.get('/coupon', couponController.loadCoupon);
+admin_route.post('/coupon', couponController.addCoupon);
+admin_route.get('/couponaction', couponController.couponAction);
+admin_route.get('/deleteCoupon', couponController.deleteCoupon);
 // admin_route.get('/expiryCoupon', couponController.expiryCoupon);
 
+
+//...............................................DASHBOARD CONTROLLER...........................................
+
+const dashboardController = require('../controllers/dashboardController');
+
+admin_route.get('/dashboard', auth.isLogin, dashboardController.loadDashboard);
 
 admin_route.get("*", (req, res) => {
 
