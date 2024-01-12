@@ -45,6 +45,11 @@ app.use('/', userRoute)
 const adminRoute = require('./routes/adminRoute');
 app.use('/admin', adminRoute)
 
+app.use("*", async (req, res) => {
+  res.redirect("/404page");
+});
+
+
 const port = process.env.PORT || 8000;
 
 app.listen(port, () => {

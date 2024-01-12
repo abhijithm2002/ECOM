@@ -2,9 +2,18 @@ const User = require('../models/userModel')
 const Category = require('../models/categoryModel');
 const Product = require('../models/productModel')
 const Orders = require('../models/ordersModel')
-const Coupon = require('../models/couponModel')
-const bcrypt = require('bcrypt')
+const Coupon = require('../models/couponModel');
+const Banner = require('../models/bannerModel');
+const Brand = require('../models/brandModel')
+const bcrypt = require('bcrypt');
+const moment = require('moment')
+const path = require('path')
 const { query } = require('express');
+
+const formatedCouponDate = (date) => {
+    return moment(date).format('MMMM DD, YYYY hh:mm A');
+
+};
 
 
 // Admin Login Load
@@ -175,7 +184,7 @@ const categoryAction = async (req, res) => {
             if (catData) {
                 // If the update is successful, fetch all users and render the userslist page
                 const categories = await Category.find({});
-                res.render('addCategory', { categories: categories });
+                res.render('addCategory', { categories: categories ,message:''});
             } else {
                 console.log('User not found or update failed');
                 // Handle the case where the user is not found or the update fails
@@ -251,7 +260,7 @@ const addProduct = async (req, res) => {
             lensTechnology: req.body.lensTechnology,
             lensColour: req.body.lensColour,
             brand: req.body.brand,
-            description: req.body.brand,
+            description: req.body.description,
             regularPrice: req.body.regularPrice,
             promoPrice: req.body.promoPrice,
             quantity: req.body.quantity,
@@ -276,7 +285,7 @@ const addProduct = async (req, res) => {
 const loadProductList = async (req, res) => {
     try {
         const product = await Product.find();
-        res.render('productList', { product })
+        res.render('productList', { product, formatedCouponDate })
     } catch (error) {
         console.log(error.message);
     }
@@ -293,7 +302,7 @@ const productAction = async (req, res) => {
                 { new: true })
             if (productData) {
                 const product = await Product.find({})
-                res.render('productList', { product: product })
+                res.render('productList', { product: product , formatedCouponDate})
             } else {
                 console.log('User not found or update failed');
                 // Handle the case where the user is not found or the update fails
@@ -328,25 +337,29 @@ const loadEditProduct = async (req, res) => {
 }
 
 
-// const loadEditProduct = async(req, res)=>{
-//     try {
-//         const id = req.query.id;
-//         const productData = await Product.findById({ _id: id })
-//         const catData = await Category.find({is_active : true})
-//         if (productData) {
-//             res.render("editProduct", { product: productData , category:catData})
-//         } else {
-//             res.redirect("/productList")
-//         }
-//     } catch (error) {
-//         console.log(error.message)
-//     }
-// }
 const updateProduct = async (req, res) => {
     try {
         const productId = req.query.id;
         console.log(productId);
+        const existingProduct = await Product.findById(productId);
 
+
+        const deletedImages = JSON.parse(req.body.deletedImages || '[]');
+        const updatedImages = existingProduct.image.filter(image => !deletedImages.includes(image));
+        
+        const newImages = await Promise.all(req.files.map(async (file) => {
+            const uniqueIdentifier = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+            const outputPath = path.join('productImages', `${uniqueIdentifier}_cropped.jpg`);
+    
+            await sharp(file.path)
+                .resize(750, 750)
+                .toFile(outputPath);
+    
+            return outputPath;
+        }));
+
+        
+        
         let updatedFields = {
             title: req.body.title,
             frameMaterial: req.body.frameMaterial,
@@ -363,17 +376,12 @@ const updateProduct = async (req, res) => {
             category: req.body.category,
             gender: req.body.gender,
             tags: req.body.tags,
+            image: [...updatedImages, ...newImages],
+
+
         };
 
-        if (req.files && req.files.length > 0) {
-            updatedFields.image = req.files.map((file) => file.path);
-        }
-
-
-        if (req.body.currentImages && Array.isArray(req.body.currentImages)) {
-            updatedFields.image = updatedFields.image ? updatedFields.image.concat(req.body.currentImages) : req.body.currentImages;
-        }
-
+       
         const productData = await Product.findByIdAndUpdate(
             { _id: productId },
             {
@@ -385,7 +393,7 @@ const updateProduct = async (req, res) => {
         console.log(productData);
         res.redirect("/admin/productList");
     } catch (error) {
-        console.log(error.message);
+        console.log(error.message); 
     }
 };
 
@@ -407,7 +415,7 @@ const loadOrderList = async (req, res) => {
         const orderData = await Orders.find({}).populate('userId').sort({ orderDate: -1 })
 
         if (orderData) {
-            res.render('orderList', { order: orderData })
+            res.render('orderList', { order: orderData ,formatedCouponDate})
         } else {
             res.write('No orders');
             res.end();
@@ -423,7 +431,7 @@ const loadOrderDetails = async (req, res) => {
 
         const orderDetails = await Orders.findById(orderId).populate('products.productId').populate('userId');
 
-        res.render('orderDetails', { order: orderDetails, orderId: orderId });
+        res.render('orderDetails', { order: orderDetails, orderId: orderId , formatedCouponDate});
     } catch (error) {
         console.log(error.message);
     }
@@ -505,7 +513,8 @@ const orderStatus = async (req, res) => {
 const loadSalesReport = async (req, res) => {
     try {
         const orderId = req.query.id;
-        const { time_period, startDate, endDate } = req.query;
+        const { time_period, orderStatus, startDate, endDate } = req.query;
+        
         let orders = await Orders.find().populate('products.productId').populate('userId');
 
         // Filter orders based on the selected time period
@@ -530,6 +539,13 @@ const loadSalesReport = async (req, res) => {
 
             filteredOrders = orders.filter(order => order.orderDate >= startOfYear);
         }
+        
+        
+            if (orderStatus && orderStatus !== 'all') {
+                // Make sure to use 'OrderStatus' instead of 'orderStatus' in the filter condition
+                filteredOrders = filteredOrders.filter(order => order.OrderStatus === orderStatus);
+                
+            }
 
         // Start and end date
         if (startDate && endDate) {
@@ -557,7 +573,10 @@ const loadSalesReport = async (req, res) => {
             orderCancelled,
             totalTransactionAmount,
             selectedTimePeriod: time_period || 'all',
-            orderId: orderId
+            selectedOrderStatus: orderStatus || 'all',
+            orderId: orderId,
+            startDate: startDate, 
+            endDate: endDate 
         });
     } catch (error) {
         console.log(error.message);
@@ -565,12 +584,192 @@ const loadSalesReport = async (req, res) => {
     }
 };
 
+const loadBanner = async(req, res)=>{
+    try {
+        const banner = await Banner.find({is_active : true})
+        res.render('banner',{banner})
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 
+const addBanner = async(req, res)=>{
+    try {
+        const banner = new Banner({
+            bannerName : req.body.bannerName,
+            bannerText : req.body.bannerText,
+            bannerImage : req.files.map((file) => file.path)
+        })
+        const bannerData = await banner.save();
+        if (bannerData) {
+            res.redirect('/admin/banner')
+        } else {
+            res.write('problem in addBanner');
+            res.end();
+        }
+
+
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+const bannerAction = async (req, res) => {
+    try {
+        const act = parseInt(req.query.act);
+        if (act == 1 || act == 0) {
+            banner = req.query.bannerId;
+            const bannerData = await Banner.findByIdAndUpdate(
+                banner,
+                { $set: { is_active: act === 1 ? true : false } },
+                { new: true })
+            if (bannerData) {
+                const banner = await Banner.find({})
+                res.render('banner', { banner: banner })
+            } else {
+                console.log('User not found or update failed');
+                // Handle the case where the user is not found or the update fails
+                res.status(404).send('User not found or update failed');
+            }
+
+        } else {
+            console.log('Invalid act parameter');
+            // Handle the case where the act parameter is not 0 or 1
+            res.status(400).send('Invalid act parameter');
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const editBanner = async (req, res) => {
+    try {
+        // Extract data from the request body
+        const { editBannerName, editBannerText, editBannerId } = req.body;
+
+        // Handle the edited banner image files (you may want to use a middleware for this)
+        const editBannerImages = req.files.map((file) => file.path);
+
+        // Find the banner by ID
+        const banner = await Banner.findById(editBannerId);
+
+        // Update the banner properties
+        banner.bannerName = editBannerName;
+        banner.bannerText = editBannerText;
+
+        // Handle the edited images
+        if (editBannerImages && editBannerImages.length > 0) {
+            // Assuming you're storing the image file paths in the database
+            banner.bannerImage = editBannerImages;
+        }
+
+        // Save the updated banner to the database
+        const updatedBanner = await banner.save();
+        console.log(updatedBanner)
+        // Send a response
+       res.redirect('/admin/banner')
+    } catch (error) {
+        console.error('Error updating banner:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+const deleteBanner = async(req, res)=>{
+    try {
+        const id = req.query.id;
+        await Banner.deleteOne({_id : id})
+        res.redirect('/admin/banner')
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+const loadBrand = async(req, res)=>{
+    try {
+
+        const brand = await Brand.find()
+
+        res.render('brand',{message:'', brand})
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+const addBrand = async (req, res) => {
+    try {
+        console.log('haii');
+        const brand = new Brand({
+            brandName: req.body.brandName,
+            brandImage: req.files.map((file) => file.path)
+        });
+        console.log(brand.brandName); // Corrected line
+        const brandData = await brand.save();
+        console.log(brandData);
+        if (brandData) {
+            res.redirect('/admin/brand');
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+const brandAction = async (req, res) => {
+    try {
+        const act = parseInt(req.query.act)
+        if (act == 1 || act == 0) {
+
+            const brandId = req.query.brandId
+            const brandData = await Brand.findByIdAndUpdate(
+                brandId,
+                { $set: { is_active: act === 1 ? true : false } },
+                { new: true }
+            );
+
+            if (brandData) {
+                // If the update is successful, fetch all users and render the userslist page
+                const brand = await Brand.find({});
+                res.render('brand', { brand: brand ,message:''});
+            } else {
+                console.log('User not found or update failed');
+                // Handle the case where the user is not found or the update fails
+                res.status(404).send('User not found or update failed');
+            }
+        } else {
+            console.log('Invalid act parameter');
+            // Handle the case where the act parameter is not 0 or 1
+            res.status(400).send('Invalid act parameter');
+        }
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const deleteBrand = async(req, res)=>{
+    try {
+        const id = req.query.id;
+        await Brand.deleteOne({ _id: id })
+        res.redirect('/admin/brand')
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+const adminLogout = async(req, res)=>{
+    try {
+        delete req.session.admin_id
+        req.session.save();
+        res.redirect('/admin')
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 
 module.exports = {
     loadLogin,
     verifyLogin,
-
     newUserLoad,
     userAction,
     loadCategory,
@@ -582,6 +781,7 @@ module.exports = {
     loadAddProduct,
     addProduct,
     loadProductList,
+    
     productAction,
     loadEditProduct,
     updateProduct,
@@ -589,7 +789,19 @@ module.exports = {
     loadOrderList,
     loadOrderDetails,
     orderStatus,
-    loadSalesReport
+    loadSalesReport,
+    loadBanner,
+    addBanner,
+    bannerAction,
+    editBanner,
+    deleteBanner,
+    loadBrand,
+    addBrand,
+    brandAction,
+    deleteBrand,
+    formatedCouponDate,
+    adminLogout
+
 
 
 

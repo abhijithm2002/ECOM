@@ -72,8 +72,27 @@ const userSchema = new mongoose.Schema({
     wallet:{
         type:Number,
         default:0
-    }
+    },
+    walletHistory: [
+        {
+            type: {
+                type: String, // 'credit' or 'debit'
+                required: true
+            },
+            amount: {
+                type: Number,
+                required: true
+            },
+            date: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
     
+    referralCode:{
+        type:String,
+   }
 })
 
 module.exports = mongoose.model('User',userSchema);

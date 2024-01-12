@@ -1,0 +1,354 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-products-grid-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:21 GMT -->
+<head>
+    <meta charset="utf-8">
+    <title>CHASHMA Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assetsb/imgs/theme/toplogo.jpeg">
+    <!-- Template CSS -->
+    <link href="/assetsb/css/main.css" rel="stylesheet" type="text/css" />
+  
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <%-include('aside')-%>
+    <main class="main-wrap">
+       <%-include('header')-%>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Banner Management</h2>
+                    
+                </div>
+              
+                    
+                    <div>
+                        <a href="#" class="btn btn-primary btn-sm rounded" data-toggle="modal" data-target="#createBannerModal">Create new</a>
+                    </div>
+               
+            </div>
+            <div class="modal fade" id="createBannerModal" tabindex="-1" role="dialog" aria-labelledby="createBannerModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="createBannerModalLabel">Create New Banner</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Form for creating a new banner -->
+                            <form id="createBannerForm" action="/admin/banner" method="post"  enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="bannerName">Banner Name</label>
+                                    <input type="text" class="form-control" id="bannerName" name="bannerName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bannerText">Banner Text</label>
+                                    <textarea class="form-control" id="bannerText" name="bannerText"></textarea>
+                                </div>
+                               <!-- Add a preview container -->
+                        <div class="form-group">
+                            <label for="bannerImage">Banner Image</label>
+                                 <input type="file" class="form-control-file" id="bannerImage" name="bannerImage" accept="image/*" multiple onchange="previewBannerImage(this)">
+                                  <div id="bannerImagePreview" class="mt-2"></div>
+                        </div>
+
+                                
+                                <button type="submit" class="btn btn-primary" onclick="createBanner()">Create Banner</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                // JavaScript function to handle the form submission
+                function createBanner() {
+                    // Get form data
+                    const formData = new FormData(document.getElementById('createBannerForm'));
+            
+                    // Make an AJAX request to your server to handle the form submission
+                    // Use fetch or another library for making AJAX requests
+            
+                    // Example using fetch
+                    fetch('/api/createBanner', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Banner created successfully:', data);
+                        // Optionally, you can close the modal or redirect the user
+                        $('#createBannerModal').modal('hide');
+                    })
+                    .catch(error => console.error('Error creating banner:', error));
+                }
+            </script>
+            <script>
+                function previewBannerImage(input) {
+    const previewContainer = document.getElementById('bannerImagePreview');
+    previewContainer.innerHTML = ''; // Clear previous preview
+
+    const files = input.files;
+
+    for (const file of files) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add('img-thumbnail'); // Optional: Add Bootstrap styling for the image preview
+            previewContainer.appendChild(img);
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+            </script>
+            <br><br>
+           
+            <div class="row">
+                <% for (let i = 0; i < banner.length; i++) { %>
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="card card-product-grid">
+                            <a href="#" class="img-wrap">
+                                <img src="/<%= banner[i].bannerImage[0] %>" style="width: 200px; height: 150px;" >
+                            </a>
+                            <div class="info-wrap">
+                                <div class="row">
+                                    <div class="col">
+                                        <a href="#" class="title"><%= banner[i].bannerName %></a>
+                                    </div>
+                                    <div class="col text-end mt-2">
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                                <i class="material-icons md-more_horiz"></i>
+                                            </a>
+                                            <div class="dropdown-menu">
+                                                <%if(banner[i].is_active){%>
+                                                <a onclick="sweet('<%= banner[i]._id %>')" value="0" class="dropdown-item" href="#">Block</a>
+                                                <%}else{%>
+                                                    <a onclick="sweetalert('<%= banner[i]._id %>')" value="1" class="dropdown-item" href="#">UnBlock</a>
+                                                <%}%>
+                                                <a class="dropdown-item text-danger" href="#" onclick="openEditBannerModal('<%= banner[i]._id %>', '<%= banner[i].bannerName %>', '<%= banner[i].bannerText %>', '<%= banner[i].bannerImage[0]%>')">Edit</a>
+
+                                                <a class="dropdown-item text-danger" href="/admin/deleteBanner?id=<%=banner[i]._id%>">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- col.// -->
+                <% } %>
+            </div>
+
+          
+            
+           <!-- Edit Banner Modal -->
+                <div class="modal fade" id="editBannerModal" tabindex="-1" role="dialog" aria-labelledby="editBannerModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editBannerModalLabel">Edit Banner</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Form for editing an existing banner -->
+                                <form id="editBannerForm" action="/admin/editBanner" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="editBannerName">Banner Name</label>
+                                        <input type="text" class="form-control" id="editBannerName" name="editBannerName"  readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editBannerText">Banner Text</label>
+                                        <textarea class="form-control" id="editBannerText" name="editBannerText"></textarea>
+                                    </div>
+                                    <!-- Add a preview container for the edited banner image -->
+                                    <div class="form-group">
+                                        <label for="editBannerImage">Edit Banner Image</label>
+                                        <input type="file" class="form-control-file" id="editBannerImage" name="editBannerImage" accept="image/*" multiple>
+                                        <div id="editBannerImagePreview" class="mt-2"></div>
+                                    </div>
+
+                                    <!-- Hidden input for storing the banner ID -->
+                                    <input type="hidden" id="editBannerId" name="editBannerId">
+
+                                    <button type="submit" class="btn btn-primary" onclick="editBanner()">Save Changes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            
+                <!-- <script>
+                    // JavaScript function to open the edit banner modal and set values
+                    function openEditBannerModal(id, name, text, images) {
+                        // Set values in the modal form
+                        document.getElementById('editBannerId').value = id;
+                        document.getElementById('editBannerName').value = name;
+                        document.getElementById('editBannerText').value = text;
+                
+                        // Clear previous image previews
+                        document.getElementById('editBannerImagePreview').innerHTML = '';
+                
+                        // Populate image previews if there are existing images
+                        if (images && images.length > 0) {
+                            const previewContainer = document.getElementById('editBannerImagePreview');
+                
+                            for (const image of images) {
+                                const img = document.createElement('img');
+                                img.src = image;
+                                img.classList.add('img-thumbnail');
+                                previewContainer.appendChild(img);
+                            }
+                        }
+                
+                        // Show the edit banner modal
+                        $('#editBannerModal').modal('show');
+                    }
+                </script> -->
+                <script>
+                    function openEditBannerModal(id, name, text, images) {
+    // Set values in the modal form
+    document.getElementById('editBannerId').value = id;
+    document.getElementById('editBannerName').value = name;
+    document.getElementById('editBannerText').value = text;
+
+    // Clear previous image previews if there are no existing images
+    const previewContainer = document.getElementById('editBannerImagePreview');
+    if (!images || images.length === 0) {
+        previewContainer.innerHTML = '';
+    }
+
+    // Populate image previews if there are existing images
+    
+
+    // Show the edit banner modal
+    $('#editBannerModal').modal('show');
+}
+
+                </script>
+         <script>
+            async function editBanner() {
+    try {
+        // Get form data
+        const formData = new FormData(document.getElementById('editBannerForm'));
+
+        // Make an AJAX request to your server to handle the form submission
+        // Use fetch or another library for making AJAX requests
+
+        // Example using fetch
+        fetch('/api/editBanner', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Banner edited successfully:', data);
+            // Optionally, you can close the modal or update the UI
+            $('#editBannerModal').modal('hide');
+        })
+        .catch(error => console.error('Error editing banner:', error));
+    } catch (error) {
+        console.error('Error editing banner:', error);
+    }
+}
+
+         </script>
+        
+            
+        </section> <!-- content-main end// -->
+        <%-include('footer')-%>
+        <script>
+            function sweet(bannerId){
+                Swal.fire({
+      title: "Are you sure?",
+      text: "You want to block Banner!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Block Banner!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Blocked!",
+          text: "Banner has been blocked.",
+          icon: "success"
+        }).then((res)=>{
+            if(res.isConfirmed){
+                window.location.href=`bannerAction?bannerId=${bannerId}&act=0`
+            }
+        })
+      }
+    });
+            }
+    
+            function sweetalert(bannerId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You want to unblock Banner!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Unblock Banner!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Unblocked!",
+                    text: "Banner has been Unblocked.",
+                    icon: "success",
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        window.location.href = `bannerAction?bannerId=${bannerId}&act=1`
+                    }
+                });
+            }
+        });
+    }
+    
+        </script>
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/assetsb/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assetsb/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assetsb/js/vendors/select2.min.js"></script>
+    <script src="/assetsb/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assetsb/js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assetsb/js/main.js" type="text/javascript"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/page-products-grid-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:33:21 GMT -->
+</html>

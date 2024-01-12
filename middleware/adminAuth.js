@@ -11,16 +11,20 @@ const isLogin = async(req, res, next)=>{
     }
 }
 
-const isLogout = async(req, res, next)=>{
+const isLogout = async (req, res, next) => {
     try {
-        if(req.session.admin_id){
-            res.redirect("/admin/dashboard")
+        if (req.session.admin_id) {
+            // If admin is logged in, redirect to dashboard
+            res.redirect("/admin/dashboard");
+        } else {
+            // If admin is not logged in, allow access to the next middleware or route
+            next();
         }
-        next();
     } catch (error) {
         console.log(error.message);
     }
-}
+};
+
 
 module.exports = {
     isLogin,

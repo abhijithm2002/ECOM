@@ -9,8 +9,19 @@ const categorySchema = new mongoose.Schema({
     is_active:{
         type:Boolean,
         default:true
+    },
+    discountPercentage :{
+        type: Number,
+        default : 0
+    },
+    expiry : {
+        type : Date
+    },
+    offerStatus : {
+        type : Boolean,
+        default : true
     }
 })
 
-const Category = mongoose.model('category', categorySchema);
+const Category = mongoose.model('Category', categorySchema);
 module.exports = Category;

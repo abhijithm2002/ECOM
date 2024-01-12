@@ -17,35 +17,54 @@
     <link rel="shortcut icon" type="image/x-icon" href="/assetsb/imgs/theme/toplogo.jpeg">
     <!-- Template CSS -->
     <link href="/assetsb/css/main.css" rel="stylesheet" type="text/css" />
+    <style>
+        /* Add this @media print style after your regular styles */
+        @media print {
+            #element-to-hide,
+            #excelButton,
+            #action,
+            #print {
+                display: none;
+            }
+        }
+    </style>
+ 
 </head>
 
 <body>
     
     <main >
        
-        <section class="content-main">
+        <section class="content-main" >
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">SALES REPORT</h2>
                     
                 </div>
             </div>
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary" id="print">Download</button>
-                <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+            <div class="row">
+                <div class="col-md-12 text-end" id="element-to-hide">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary" onclick="exportToExcel()" id="excelButton">Excel</button>
+                        <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                    </div>
+            
+                    <div  class="btn-group ms-2">
+                        <button type="submit" class="btn btn-primary" id="print">Download pdf</button>
+                        <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
+                    </div>
+                </div>
             </div>
+            
             <br>
             <div class="row">
                 <div class="col-md-9">
                     <div class="card mb-4">
                         <header class="card-header">
-                            <div class="row gx-3">
-                                <div class="col-lg-4 col-md-6 me-auto">
-                                    <form action="/salesReport">
-                                    <input type="text" placeholder="Search..." class="form-control">
-                                </form>
-                                </div>
-                                <div class="col-lg-2 col-md-3 col-6">
+                            <div class="row ">
+                               
+                              
+                                <div class="col-lg-2 col-md-3 col-6" id="time_period">
                                     <select class="form-select" id="time_period" name="time_period">
                                         <option value="all">Status</option>
                                         <option value="weekly">weekly</option>
@@ -53,22 +72,36 @@
                                         <option value="yearly">yearly</option>
                                     </select>
                                 </div>
+                            
                                 <div class="col-lg-2 col-md-3 col-6">
-                                    <input type="date" class="form-control" id="startDate" name="startDate">
-                                </div>
-                                <div class="col-lg-2 col-md-3 col-6">
-                                    <input type="date" class="form-control" id="endDate" name="endDate">
-                                </div>
-                                <div class="col-lg-2 col-md-3 col-6">
-                                    <a href="#" class="btn btn-md rounded font-sm" id="searchButton">Search</a>
+                                    <select class="form-select" id="orderStatus" name="orderStatus" value="orderStatus">
+                                        <option value="all">orderStatus</option>
+                                        <option value="order placed">order placed</option>
+                                        <option value="shipped">shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Order Cancelled">Order Cancelled</option>
+                                        <option value="Returned">Returned</option>
+                                    </select>
                                 </div>
                                 
-                               
+                                <div class="col-lg-2 col-md-3 col-6">
+                                    <input type="date" class="form-control" id="startDate" name="startDate" value="<%= startDate %>">
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-6">
+                                    <input type="date" class="form-control" id="endDate" name="endDate" value="<%= endDate %>">
+                                </div>
+                                
+                                <div class="col-lg-2 col-md-3 col-6" >
+                                    <button class="btn btn-md rounded font-sm" id="searchButton">Search</button>
+                                </div>                     
                             </div>
+                           
                         </header> <!-- card-header end// -->
+                        
+  
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-hover">
+                                <table class="table table-hover" id="table">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -76,7 +109,7 @@
                                             <th>Price</th>
                                             <th>Status</th>
                                             <th>Date</th>
-                                            <th class="text-end"> Action </th>
+                                            <th class="text-end" id="action"> Action </th>
                                         </tr>
                                     </thead>
                                   
@@ -92,13 +125,24 @@
                                                 <td><%= order.totalAmount.toFixed(2) %></td>
                                                 <td><span class="badge rounded-pill alert-success"><%= order.OrderStatus%></span></td>
                                                 <td><%= order.orderDate.toDateString() %></td>
-                                                <td class="text-end">
+                                                <td class="text-end" id="action">
                                                     <a href="/admin/orderDetails?id=<%= order._id %>" class="btn btn-md rounded font-sm">Detail</a>
                                                 </td>
                                             </tr>
                                         <% }); %>
                                     </tbody>
                                 </table>
+                                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+                                <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+                                <script>
+                                    $(document).ready(function () {
+                                        new DataTable('#table');
+                                
+                                })
+                                </script>
+                              
+                        
                             </div> <!-- table-responsive //end -->
                         </div> <!-- card-body end// -->
                     </div> <!-- card end// -->
@@ -109,31 +153,45 @@
                         <div class="card-body">
                             <h5 class="mb-3">REPORT</h5>
                             <form>
+                                <% if (startDate) { %>
+                                <div class="mb-4">
+                                    <label for="order_id" class=" font-weight-bold">Start Date</label>
+                                    <input type="text" class="form-control" id="startDate" value="<%=startDate%>" readonly>
+                                   
+                                </div>
+                                <% } %>
+                                <% if (endDate) { %>
+                                <div class="mb-4">
+                                    <label for="order_id" class=" font-weight-bold">End Date</label>
+                                    <input type="text" class="form-control" id="endDate" value="<%=endDate%>" readonly >
+                                   
+                                </div>
+                                <% } %>
                                 <div class="mb-4">
                                     <label for="order_id" class=" font-weight-bold">Total No: of Orders</label>
-                                    <input type="text" class="form-control" id="order_id" value="<%=totalOrders%>" >
+                                    <input type="text" class="form-control" id="order_id" value="<%=totalOrders%>" readonly >
                                    
                                 </div>
                                 <div class="mb-4">
                                     <label for="order_customer" class=" font-weight-bold">Total No: of Customers</label>
-                                    <input type="text" class="form-control" id="order_customer" value="<%=uniqueConstomers%>" >
+                                    <input type="text" class="form-control" id="order_customer" value="<%=uniqueConstomers%>" readonly >
                                 </div>
                                
                                 <div class="mb-4">
                                     <label for="order_total"  class=" font-weight-bold">No: of Cash On Delivery</label>
-                                    <input type="text"  class="form-control" id="order_total" value="<%=cashOnDelivery%>">
+                                    <input type="text"  class="form-control" id="order_total" value="<%=cashOnDelivery%>" readonly>
                                 </div>
                                 <div class="mb-4">
                                     <label for="order_created_date"  class=" font-weight-bold">No: of Online Payment</label>
-                                    <input type="text" class="form-control" id="order_created_date" value="<%=onlinePayment%>">
+                                    <input type="text" class="form-control" id="order_created_date" value="<%=onlinePayment%>" readonly>
                                 </div>
                                 <div class="mb-4">
                                     <label for="order_modified_date" class=" font-weight-bold">No: of OrderCancelled</label>
-                                    <input type="text" class="form-control" id="order_modified_date" value="<%=orderCancelled%>">
+                                    <input type="text" class="form-control" id="order_modified_date" value="<%=orderCancelled%>" readonly>
                                 </div>
                                 <div class="mb-4">
                                     <label for="order_customer_1" class=" font-weight-bold">Total Transaction</label>
-                                    <input type="text" class="form-control" id="order_customer_1" value="<%=totalTransactionAmount%>" >
+                                    <input type="text" class="form-control" id="order_customer_1" value="<%=totalTransactionAmount%>" readonly >
                                 </div>
                             </form>
                             <form>
@@ -141,26 +199,27 @@
                     </div> <!-- card end// -->
                 </div>
             </div>
-            <div class="pagination-area mt-15 mb-50">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-                    </ul>
-                </nav>
-            </div>
+            
         </section> <!-- content-main end// -->
-        <script>
+        <!-- <script>
             document.getElementById('searchButton').addEventListener('click', function () {
                 const timePeriod = document.getElementById('time_period').value;
                 const startDate = document.getElementById('startDate').value;
                 const endDate = document.getElementById('endDate').value;
         
                 const searchUrl = `/admin/salesReport?time_period=${timePeriod}&startDate=${startDate}&endDate=${endDate}`;
+                window.location.href = searchUrl;
+            });
+        </script> -->
+       
+        <script>
+            document.getElementById('searchButton').addEventListener('click', function () {
+                const timePeriod = document.getElementById('time_period').value;
+                const orderStatus = document.getElementById('orderStatus').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+        
+                const searchUrl = `/admin/salesReport?time_period=${timePeriod}&orderStatus=${orderStatus}&startDate=${startDate}&endDate=${endDate}`;
                 window.location.href = searchUrl;
             });
         </script>
@@ -171,22 +230,59 @@
                 window.print();
               });
             </script>
-        
-        <footer class="main-footer font-xs">
-            <div class="row pb-30 pt-15">
-                <div class="col-sm-6">
-                    <script>
-                    document.write(new Date().getFullYear())
-                    </script> ©, Evara - HTML Ecommerce Template .
-                </div>
-                <div class="col-sm-6">
-                    <div class="text-sm-end">
-                        All rights reserved
-                    </div>
-                </div>
-            </div>
-        </footer>
+            
+            
+            <!-- export excel -->
+           <!-- export excel -->
+<!-- export excel -->
+<script>
+    
+    function exportToExcel() {
+        const htmlTable = document.getElementById('table');
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Sales Report");
+        const headerRow = worksheet.addRow([]);
+        const headerCells = htmlTable.getElementsByTagName('th');
+
+        for (let i = 0; i < headerCells.length; i++) {
+            headerRow.getCell(i + 1).value = headerCells[i].innerText;
+        }
+
+        const rows = htmlTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            const rowData = [];
+            for (let j = 0; j < cells.length; j++) {
+                rowData.push(cells[j].innerText);
+            }
+            worksheet.addRow(rowData);
+        }
+
+        // Add headers for the additional report data
+        const reportHeaders = ['Start Date', 'End Date', 'Total No: of Orders', 'Total No: of Customers', 'No: of Cash On Delivery', 'No: of Online Payment', 'No: of OrderCancelled', 'Total Transaction'];
+        worksheet.addRow(reportHeaders);
+
+        // Add additional rows for the report data
+        const reportRows = document.querySelectorAll('#startDate, #endDate, #order_id, #order_customer, #order_total, #order_created_date, #order_modified_date, #order_customer_1');
+        const reportData = Array.from(reportRows).map(row => row.value);
+        worksheet.addRow(reportData);
+
+        workbook.xlsx.writeBuffer().then((buffer) => {
+            const blob = new Blob([buffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+            saveAs(blob, "output.xlsx");
+        });
+    }
+</script>
+
+
+        <%-include('footer')-%>
     </main>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <script src="/assetsb/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/assetsb/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="/assetsb/js/vendors/select2.min.js"></script>

@@ -4,9 +4,14 @@ const Cart = require('../models/cartModel')
 const Orders = require('../models/ordersModel')
 const Category = require('../models/categoryModel')
 const Coupon = require('../models/couponModel')
+const Banner = require('../models/bannerModel')
+const Brand = require('../models/brandModel')
+const Contact = require('../models/contactModel');
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
 const moment = require('moment')
+const RandomString = require('randomstring');
+
 const { name } = require('ejs')
 
 const formatedCouponDate = (date) => {
@@ -69,13 +74,16 @@ const verifyLogin = async (req, res) => {
 
 const userLogout = async (req, res) => {
     try {
-        req.session.destroy((error) => {
-            if (error) {
-                console.log(error.message)
-            } else {
-                res.redirect('/login')
-            }
-        });
+        // req.session.destroy((error) => {
+        //     if (error) {
+        //         console.log(error.message)
+        //     } else {
+        //         res.redirect('/login')
+        //     }
+        // });
+        delete req.session.userId
+        req.session.save();
+        res.redirect('/login')
 
     } catch (error) {
         console.log(error.message)
@@ -85,45 +93,23 @@ const userLogout = async (req, res) => {
 // user load register
 const loadRegister = async (req, res) => {
     try {
-        res.render('registration', { message: "" })
+        const referralCode = req.query.referralCode || "";
+        res.render('registration', { message: "", referralCode })
     } catch (error) {
         console.log(error.message);
     }
 }
 
-// insert userdata
-
-// const insertUser = async (req, res) => {
-//     try {
-//         let obj = {
-//             name: req.body.name,
-//             email: req.body.email,
-//             mobile: req.body.mno,
-//             password: req.body.password,
-//             cpassword: req.body.cPassword
-//         }
-//         req.session.obj = obj
-//         req.session.email = req.body.email
-
-//         res.redirect('/verifyOtp')
-
-//     } catch (error) {
-//         console.log(error)
-//     }
-// }
-
-
-
 const insertUser = async (req, res) => {
     try {
-        const { name, email, mno, password, cPassword } = req.body;
+        const { name, email, mno, password, cPassword, referralCode } = req.body;
 
         // Check if email or mobile number already exists
         const existingUser = await User.findOne({ $or: [{ email }, { mobile: mno }] });
         console.log('hai')
 
         if (existingUser) {
-            const message = 'Email or mobile number already exists. Please use a different email or mobile number.';
+            const message = 'Email or mobile number already exists';
             res.render('registration', { message });
         } else {
             // If not, proceed with the registration process
@@ -137,18 +123,38 @@ const insertUser = async (req, res) => {
                 mobile: mno,
                 password: hashedPassword,
                 cPassword: cPassword,
-                date: currentDate
+                date: currentDate,
+                referralCode: referralCode
+
             }
             console.log(cPassword)
 
             req.session.obj = obj;
             req.session.email = email;
 
+
             res.redirect('/verifyOtp');
         }
     } catch (error) {
         console.log(error);
         res.status(500).render('registration', { message: 'An error occurred during registration.' });
+    }
+}
+
+const checkReferral = async (req, res) => {
+    try {
+        const { referralCode } = req.body;
+
+        // Find the user with the given referral code
+        const user = await User.findOne({ referralCode: referralCode });
+
+        if (user) {
+            res.json({ isValid: true, message: 'Referral code is valid!' });
+        } else {
+            res.json({ isValid: false, message: 'Referral code is invalid.' });
+        }
+    } catch (error) {
+        console.log(error.message)
     }
 }
 
@@ -194,42 +200,8 @@ const loadVerifyOtp = async (req, res) => {
     }
 }
 
-// verifyOtp
-
-// const verifyOtp = async (req, res) => {
-//     try {
-//         const otp = req.body.otp;
-//         const obj = req.session.obj
-//         const randomotp = req.session.randomotp;
 
 
-//         console.log(randomotp);
-
-//         if (randomotp == otp) {
-//             const user = new User({
-//                 name: obj.name,
-//                 email: obj.email,
-//                 mobile: obj.mobile,
-//                 password: obj.password,
-//                 password: obj.cpassword,
-//                 is_admin: 0
-//             });
-//             console.log('hello')
-//             const userData = await user.save();
-//             console.log(userData);
-//             if (userData) {
-//                 res.redirect('/login');
-//             }
-//             // Assuming user.save() is a promise-based operation
-//         } else {
-//             console.log('hai');
-
-//         }
-//     } catch (error) {
-//         console.log(error.message);
-//         res.redirect(500, '/login');
-//     }
-// }
 const verifyOtp = async (req, res) => {
     try {
         const otp = req.body.otp;
@@ -238,13 +210,30 @@ const verifyOtp = async (req, res) => {
 
         console.log(randomotp);
 
+        const myReferralCode = await generateReferralCode();
+
+        async function generateReferralCode() {
+            const randomString = RandomString.generate(5);
+            const randomNumber = Math.floor(100 + Math.random() * 900).toString();
+            const RandomReferralCode = randomString + randomNumber;
+
+            const userData = await User.findOne({ referralCode: RandomReferralCode });
+
+            if (userData) {
+                return await generateReferralCode();
+            } else {
+                return RandomReferralCode;
+            }
+        }
+
         if (randomotp == otp) {
             const user = new User({
                 name: obj.name,
                 email: obj.email,
                 mobile: obj.mobile,
                 password: obj.password,
-                cpassword: obj.cpassword, // Use a different key for confirmation password
+                cpassword: obj.cpassword,
+                referralCode: myReferralCode,
                 is_admin: 0
             });
 
@@ -253,6 +242,15 @@ const verifyOtp = async (req, res) => {
             const userData = await user.save();
 
             console.log(userData, 'uyuygfityftyofotu');
+
+            if (obj.referralCode) {
+
+                const referalData = await User.findOneAndUpdate({ referralCode: obj.referralCode }, { $inc: { wallet: 200 } });
+                if (referalData) {
+                    await User.findOneAndUpdate({ email: obj.email }, { $set: { wallet: 100 } });
+                }
+
+            }
 
             if (userData) {
                 res.redirect('/login');
@@ -265,6 +263,9 @@ const verifyOtp = async (req, res) => {
         res.status(500).redirect('/login'); // Use res.status(500) instead of res.redirect(500, '/login')
     }
 };
+
+
+
 
 
 // loading Home
@@ -280,9 +281,11 @@ const loadHome = async (req, res) => {
         const isLoggedIn = !!req.session.userId
         const userId = req.session.userId;
         const user = await User.findById(userId);
-
-
-        // const product = await Product.find({ is_active: true  })
+        const banners = await Banner.find({ is_active: true });
+        const brand = await Brand.find({is_active : true});
+        
+        const admin = await User.findOne({ is_admin: 1 });
+        const newArrival = await Product.find({ is_active: true  }).sort({date:-1}).populate('category')
 
         const product = await Product.find({
             is_active: true,
@@ -290,9 +293,30 @@ const loadHome = async (req, res) => {
                 { title: { $regex: '.*' + search + '.*', $options: 'i' } },
                 { brand: { $regex: '.*' + search + '.*', $options: 'i' } }
             ]
-        });
+        }).sort({ date: -1 });
 
-        res.render('home', { product, isLoggedIn, user })
+        const mostOrderedProducts = await Orders.aggregate([
+            {
+                $unwind: "$products"
+            },
+            {
+                $group: {
+                    _id: "$products.productId",
+                    totalQuantity: { $sum: "$products.quantity" }
+                }
+            },
+            {
+                $sort: { totalQuantity: -1 }
+            },
+            {
+                $limit: 4 
+            }
+        ]);
+
+        const mostOrderedProductIds = mostOrderedProducts.map(product => product._id);
+        const mostOrderedProductsData = await Product.find({ _id: { $in: mostOrderedProductIds } });
+
+        res.render('home', {newArrival, product, isLoggedIn, user,brand, banners,admin ,mostOrderedProducts: mostOrderedProductsData})
     } catch (error) {
         console.log(error.message);
     }
@@ -302,7 +326,9 @@ const loadHome = async (req, res) => {
 
 const forgetLoad = async (req, res) => {
     try {
-        res.render('forget');
+        const userId = req.session.userId
+        const user = await User.findById(userId)
+        res.render('forget',{user});
     } catch (error) {
         console.log(error.message);
     }
@@ -324,129 +350,134 @@ const forgetVerify = async (req, res) => {
     }
 }
 
-// const productList = async (req, res) => {
-//     try {
-//         const categoryName = req.query.category;
-//         const userId = req.session.userId;
-//         const catData = await Category.find({ is_active: true });
-
-//         let products;
-
-//         if (!categoryName || categoryName === 'Category') {
-
-//             products = await Product.find({ is_active: true });
-//         } else {
-
-//             products = await Product.find({ category: categoryName, is_active: true });
-//         }
-
-//         //sort
-//         const sortBy = req.query.sortBy || 'featured';
-
-//         switch (sortBy) {
-//             case 'lowToHigh':
-//                 products.sort((a, b) => a.regularPrice - b.regularPrice);
-//                 break;
-//             case 'highToLow':
-//                 products.sort((a, b) => b.regularPrice - a.regularPrice);
-//                 break;
-
-//             default:
-
-//                 break;
-//         }
-
-//           res.render('productList', { catData, products, selectedCategory: categoryName });
-
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// };
 const productList = async (req, res) => {
     try {
-
-
         var search = '';
         if (req.query.search) {
             search = req.query.search;
         }
 
+        var page = 1;
+        if (req.query.page) {
+            page = req.query.page;
+        }
+
+        const isLoggedIn = !!req.session.userId;
         const categoryId = req.query.category;
         const userId = req.session.userId;
+        const user = await User.findById(userId);
         const catData = await Category.find({ is_active: true });
-        let catName = await Category.findById(categoryId)
-        if(!catName){
-            catName=''
-        }
-        let products;
+        const admin = await User.findOne({ is_admin: 1 });
+        let catName = '';
 
-        if (!categoryId) {
-            
-            products = await Product.find({
-                is_active: true,
-                $or: [
-                    { title: { $regex: '.*' + search + '.*', $options: 'i' } },
-                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } }
-                ]
-            });
-        } else {
-            
-            products = await Product.find({
-                category: categoryId,
-                is_active: true,
-                $or: [
-                    { title: { $regex: '.*' + search + '.*', $options: 'i' } },
-                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } }
-                ]
-            });
+        if (categoryId) {
+            catName = await Category.findById(categoryId);
+        }
+
+        let products;
+        let count;
+        const itemsPerPage = req.query.itemsPerPage || 6;
+
+        let query = {
+            is_active: true,
+        };
+
+        if (categoryId) {
+            query.category = categoryId;
+        }
+
+        if (search) {
+            query.$or = [
+                { title: { $regex: '.*' + search + '.*', $options: 'i' } },
+                { brand: { $regex: '.*' + search + '.*', $options: 'i' } }
+            ];
         }
 
         // Sort
         const sortBy = req.query.sortBy || 'featured';
+        const sort = {};
 
         switch (sortBy) {
             case 'lowToHigh':
-                products.sort((a, b) => a.regularPrice - b.regularPrice);
+                sort.regularPrice = 1;
                 break;
             case 'highToLow':
-                products.sort((a, b) => b.regularPrice - a.regularPrice);
+                sort.regularPrice = -1;
                 break;
             default:
                 break;
         }
-         
-        res.render('productList', { catData, products, selectedCategory: catName.name });
+
+        // Apply both search and sort criteria
+        products = await Product.find(query)
+            .populate('category')
+            .sort(sort)
+            .limit(itemsPerPage * 1)
+            .skip((page - 1) * itemsPerPage)
+            .exec();
+
+        count = await Product.find(query).countDocuments();
+
+        res.render('productList', {
+            categoryId,
+            itemsPerPage,
+            catData,
+            products,
+            selectedCategory: catName,
+            isLoggedIn,
+            user,
+            totalPages: Math.ceil(count / itemsPerPage),
+            currentPage: page,
+            admin,
+            search,
+            sortBy,
+        });
+
     } catch (error) {
         console.log(error.message);
     }
 };
 
 
+
 const loadProductDetails = async (req, res) => {
     try {
-        const isLoggedIn = !!req.session.userId
+        const isLoggedIn = !!req.session.userId;
         const userId = req.session.userId;
         const user = await User.findById(userId);
-        const productId = req.query.productId
-        const product = await Product.findById(productId)
-
-
-        res.render('productDetails', { product, isLoggedIn, user })
+        const productId = req.query.productId;
+        const product = await Product.findById(productId);
+        const banners = await Banner.find({is_active : true})
+        console.log(product.quantity);
+        const admin = await User.findOne({ is_admin: 1 });
+        const relatedProducts = await Product.find({
+            is_active : true,
+            category: product.category,
+           
+            _id: { $ne: productId }, 
+        })
+        res.render('productDetails', { product, isLoggedIn, user, admin, quantity: product.quantity, productId, relatedProducts , banners});
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        res.status(500).send('Internal Server Error');
     }
-}
+};
+
 
 
 const loadCart = async (req, res) => {
     try {
         const id = req.session.userId;
+        const userId = req.session.userId
+        const user = await User.findById(userId)
+        const isLoggedIn = !!req.session.userId
+        const admin = await User.findOne({ is_admin: 1 });
 
         if (!id) {
 
             return res.redirect('/login');
         }
-
+        const product = await Product.find({is_active : true})
         // Fetch user data
         const userData = await User.findById({ _id: id });
 
@@ -454,7 +485,7 @@ const loadCart = async (req, res) => {
         const cartData = await Cart.findOne({ userId: id }).populate('products.productId');
 
         if (userData && cartData) {
-            res.render('addCart', { userData, cartData });
+            res.render('addCart', { userData, cartData, isLoggedIn,admin , product,user});
         } else {
             res.redirect('/login');
         }
@@ -549,10 +580,17 @@ const addToCart = async (req, res) => {
                 // You might want to handle this case differently based on your requirements
             }
         } else {
-            // If the product is not in the cart, add it with quantity 1 and calculate subtotal
+            // If the product is not in the cart and has a positive quantity, add it with quantity 1 and calculate subtotal
             const productInfo = await Product.findById(productId);
-            const subtotal = productInfo.promoPrice;
-            cartData.products.push({ productId, quantity, subtotal });
+
+            if (productInfo.quantity > 0) {
+                const subtotal = productInfo.promoPrice;
+                cartData.products.push({ productId, quantity, subtotal });
+            } else {
+                // Product is out of stock, handle this case (e.g., show an error message)
+                console.error(`Product ${productId} is out of stock`);
+                // You might want to handle this case differently based on your requirements
+            }
         }
 
         // Step 4: Save the updated cartData
@@ -616,16 +654,20 @@ const deleteCart = async (req, res) => {
 // Load User profile.............
 const loadUserProfile = async (req, res) => {
     try {
+        const isLoggedIn = !!req.session.userId
         const userId = req.session.userId
         const orderId = req.query._id
-        console.log(req.session.userId)
+        console.log('userId',req.session.userId)
         const user = await User.findById(userId)
-        const orderData = await Orders.find({ userId: userId }).sort({ orderDate: -1 })
-        // const orderData = await Orders.find({}).populate('userId').sort({orderDate :-1})
+        const orderData = await Orders.find({ userId: userId }).populate('products.productId').sort({ orderDate: -1 })
+        const admin = await User.findOne({ is_admin: 1 });
         console.log(orderData)
+   
+        // const orderData = await Orders.find({}).populate('userId').sort({orderDate :-1})
+       
         if (user) {
-
-            res.render('userProfile', { user, orderData, orderId, formatedCouponDate })
+  
+            res.render('userProfile', {  user, orderData, orderId, isLoggedIn, formatedCouponDate,admin })
         } else {
             res.redirect('/home')
         }
@@ -637,7 +679,11 @@ const loadUserProfile = async (req, res) => {
 // Load Address...
 const loadAddress = async (req, res) => {
     try {
-        res.render('addAddress', { message: "" })
+        const userId = req.session.userId
+        const user = await User.findById(userId)
+        const isLoggedIn = !!req.session.userId
+        const admin = await User.findOne({ is_admin: 1 });
+        res.render('addAddress', { message: "",admin,isLoggedIn , user})
     } catch (error) {
         console.log(error.message)
     }
@@ -685,15 +731,17 @@ const addAddress = async (req, res) => {
 
 const loadEditAddress = async (req, res) => {
     try {
+        const isLoggedIn = !!req.session.userId
         const userId = req.session.userId;
         const index = req.query.index;
         const checkout = req.query.checkout;
-
-
+        const admin = await User.findOne({ is_admin: 1 });
+      
+        const user = await User.findById(userId)
         const userData = await User.findById(userId);
         const address = userData.address[index]
 
-        res.render('editAddress', { userData, address, index, checkout })
+        res.render('editAddress', {user, userData, address, index, checkout, admin, isLoggedIn })
 
 
     } catch (error) {
@@ -749,9 +797,13 @@ const loadCheckout = async (req, res) => {
     try {
         const currentDate = Date.now();
         console.log(req.query.subtotal)
+        const isLoggedIn = !!req.session.userId
         const subtotal = parseInt(req.query.subtotal)
         const userId = req.session.userId;
+        const admin = await User.findOne({ is_admin: 1 });
         console.log(userId)
+        const productId = req.query.productId
+        const product = await Product.findById(productId)
         const user = await User.findById(userId)
         const cart = await Cart.findOne({ userId }).populate('products.productId')
         const coupon = await Coupon.find({
@@ -762,7 +814,7 @@ const loadCheckout = async (req, res) => {
 
 
         console.log(user)
-        res.render('checkout', { user, cart, subtotal, coupon, message: "" })
+        res.render('checkout', { user, cart, subtotal, coupon, message: "", isLoggedIn ,admin})
     } catch (error) {
         console.log(error.message)
     }
@@ -857,13 +909,65 @@ let applyCoupon = async (req, res) => {
 
 };
 
+const load404Page = async(req, res)=>{
+    try {
+       
+        res.render('404page')
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 
+const loadAbout = async(req, res)=>{
+    try {
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+        const isLoggedIn = !!req.session.userId
+        const admin = await User.findOne({ is_admin: 1 });
+        const product = await Product.find({is_active : true});
+        const brand = await Brand.find({is_active : true})
+        res.render('about' , {isLoggedIn, admin , user, brand})
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 
+const loadContact = async(req, res)=>{
+    try {
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+        const isLoggedIn = !!req.session.userId
+        const admin = await User.findOne({ is_admin: 1 });
+        res.render('contact',{isLoggedIn, admin, user})
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 
+const addContact = async(req, res)=>{
+    try {
+        const contact = new Contact({
+            name : req.body.name,
+            email : req.body.email,
+            phone : req.body.phone,
+            subject : req.body.subject,
+            message : req.body.message
+        })
+
+        const contactData = await contact.save();
+        if(contactData){
+            res.redirect('/contact')
+        }
+
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 module.exports = {
     loadLogin,
     loadRegister,
     insertUser,
+    checkReferral,
     verifyLogin,
     userLogout,
     loadVerifyOtp,
@@ -884,5 +988,9 @@ module.exports = {
     updateAddress,
     loadCheckout,
     applyCoupon,
-    formatedCouponDate
+    formatedCouponDate,
+    load404Page,
+    loadAbout,
+    loadContact,
+    addContact
 }

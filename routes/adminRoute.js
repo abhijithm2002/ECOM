@@ -37,7 +37,17 @@ admin_route.get('/deleteProduct', auth.isLogin, adminController.deleteProduct);
 admin_route.get('/orderList', auth.isLogin, adminController.loadOrderList)
 admin_route.get('/orderDetails', adminController.loadOrderDetails)
 admin_route.post('/orderStatus', auth.isLogin, adminController.orderStatus);
-admin_route.get('/salesReport',auth.isLogin,adminController.loadSalesReport)
+admin_route.get('/salesReport',auth.isLogin,adminController.loadSalesReport);
+admin_route.get('/banner',adminController.loadBanner);
+admin_route.post('/banner', upload.array('bannerImage',3), adminController.addBanner);
+admin_route.get('/bannerAction',adminController.bannerAction);
+admin_route.post('/editBanner', upload.array('editBannerImage',3), adminController.editBanner);
+admin_route.get('/deleteBanner',adminController.deleteBanner);
+admin_route.get('/brand', adminController.loadBrand);
+admin_route.post('/brand', upload.array("brandImage"), adminController.addBrand);
+admin_route.get('/brandaction',adminController.brandAction);
+admin_route.get('/deleteBrand',adminController.deleteBrand);
+admin_route.get('/adminlogout',auth.isLogin,adminController.adminLogout)
 
 
 
@@ -57,6 +67,16 @@ admin_route.get('/deleteCoupon', couponController.deleteCoupon);
 const dashboardController = require('../controllers/dashboardController');
 
 admin_route.get('/dashboard', auth.isLogin, dashboardController.loadDashboard);
+
+//..............................................OFFER CONTROLLER................................................
+
+const offerController = require('../controllers/offerController')
+
+
+admin_route.get('/categoryOffer', offerController.loadCategoryOffer);
+admin_route.post('/categoryOffer', offerController.addCategoryOffer);
+admin_route.get('/categoryOfferAction', offerController.categoryOfferAction);
+admin_route.get('/deleteCategoryOffer', offerController.deleteCategoryOffer);
 
 admin_route.get("*", (req, res) => {
 

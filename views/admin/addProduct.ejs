@@ -22,116 +22,7 @@
 
 <body>
     <div class="screen-overlay"></div>
-    <aside class="navbar-aside" id="offcanvas_aside">
-        <div class="aside-top">
-            <a href="index.html" class="brand-wrap">
-                <img src="/assetsb/imgs/theme/chashma.png" class="logo" alt="CHASHMA Dashboard">
-            </a>
-            <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
-            </div>
-        </div>
-        <nav>
-            <ul class="menu-aside">
-                <li class="menu-item active">
-                    <a class="menu-link" href="/admin/dashboard"> <i class="icon material-icons md-home"></i>
-                        <span class="text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">Products</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/productList">Product List</a>
-                        
-                        <a href="/admin/addCategory">Categories</a>
-                        <a href="/admin/coupon">Coupon</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-orders-1.html"> <i class="icon material-icons md-shopping_cart"></i>
-                        <span class="text">Orders</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/orderList">Order list </a>
-                        
-                        <a href="/admin/salesReport">sales Report</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-sellers-cards.html"> <i class="icon material-icons md-store"></i>
-                        <span class="text">Users</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-sellers-cards.html">Users cards</a>
-                        <a href="/admin/userslist">Users list</a>
-                        <a href="page-seller-detail.html">Users profile</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-form-product-1.html"> <i class="icon material-icons md-add_box"></i>
-                        <span class="text">Add product</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/addProduct">Add product </a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-transactions-1.html"> <i class="icon material-icons md-monetization_on"></i>
-                        <span class="text">Transactions</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-transactions-1.html">Transaction 1</a>
-                        <a href="page-transactions-2.html">Transaction 2</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
-                        <span class="text">Account</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-account-login.html">User login</a>
-                        <a href="page-account-register.html">User registration</a>
-                        <a href="page-error-404.html">Error 404</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
-                        <span class="text">Reviews</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-brands.html"> <i class="icon material-icons md-stars"></i>
-                        <span class="text">Brands</span> </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" disabled href="#"> <i class="icon material-icons md-pie_chart"></i>
-                        <span class="text">Statistics</span>
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            <ul class="menu-aside">
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
-                        <span class="text">Settings</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-settings-1.html">Setting sample 1</a>
-                        <a href="page-settings-2.html">Setting sample 2</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
-                        <span class="text"> Starter page </span>
-                    </a>
-                </li>
-            </ul>
-            <br>
-            <br>
-        </nav>
-    </aside>
+    <%-include('aside')-%>
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
@@ -217,7 +108,7 @@
                             <h4>Basic</h4>
                         </div>
                         <div class="card-body">
-                            <form action="/admin/addProduct" method="post" enctype="multipart/form-data">
+                            <form id="productForm" action="/admin/addProduct" method="post" enctype="multipart/form-data">
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Product title</label>
                                     <input type="text" placeholder="Type here" name="title" class="form-control"
@@ -283,22 +174,25 @@
                                         <div class="mb-4">
                                             <label class="form-label">Regular price</label>
                                             <div class="row gx-2">
-                                                <input placeholder="$" type="text" name="regularPrice"
-                                                    class="form-control">
+                                                <input placeholder="$" type="text" name="regularPrice" class="form-control" id="regularPrice">
                                             </div>
+                                            <div id="regularPriceError" class="text-danger"></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label class="form-label">Promotional price</label>
-                                            <input placeholder="$" type="text" name="promoPrice" class="form-control">
+                                            <input placeholder="$" type="text" name="promoPrice" class="form-control" id="promoPrice">
+                                            <div id="promoPriceError" class="text-danger"></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <label class="form-label">Quantity</label>
-                                        <input type="number" name="quantity" class="form-control">
+                                        <input type="number" name="quantity" class="form-control" id="quantity">
+                                        <div id="quantityError" class="text-danger"></div>
                                     </div>
                                 </div>
+                
 
 
 
@@ -307,7 +201,36 @@
                     </div>
 
                 </div>
-
+                <script>
+                    document.getElementById('productForm').addEventListener('submit', function (event) {
+                        // Get values from form inputs
+                        var regularPrice = parseFloat(document.getElementById('regularPrice').value);
+                        var promoPrice = parseFloat(document.getElementById('promoPrice').value);
+                        var quantity = parseInt(document.getElementById('quantity').value);
+                
+                        // Clear previous error messages
+                        document.getElementById('regularPriceError').textContent = '';
+                        document.getElementById('promoPriceError').textContent = '';
+                        document.getElementById('quantityError').textContent = '';
+                
+                        // Validation rules
+                        if (isNaN(regularPrice) || regularPrice < 0) {
+                            document.getElementById('regularPriceError').textContent = 'Please enter a valid number';
+                            event.preventDefault(); // Prevent form submission
+                        } else if (isNaN(promoPrice) || promoPrice < 0) {
+                            document.getElementById('promoPriceError').textContent = 'Please enter a valid number';
+                            event.preventDefault();
+                        } else if (isNaN(quantity) || quantity < 0) {
+                            document.getElementById('quantityError').textContent = 'Please enter a valid number ';
+                            event.preventDefault();
+                        } else if (promoPrice > regularPrice) {
+                            document.getElementById('promoPriceError').textContent = '  Regular Price should be greater ';
+                            event.preventDefault(); // Prevent form submission
+                        }
+                        // Add more validation rules as needed
+                
+                    });
+                </script>
                 <div class="col-lg-3">
                     <div class="card mb-4">
                         <div class="card-header">

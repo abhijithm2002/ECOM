@@ -4,12 +4,18 @@ const Cart = require('../models/cartModel')
 const Product = require('../models/productModel');
 const Coupon = require('../models/couponModel')
 const Razorpay = require('razorpay');
+const moment = require('moment');
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
 const razorpayInstance = new Razorpay({
     key_id: RAZORPAY_ID_KEY,
     key_secret: RAZORPAY_SECRET_KEY
 });
+
+const formatedCouponDate = (date) => {
+    return moment(date).format('MMMM DD, YYYY hh:mm A');
+
+};
 
 const placeOrder = async (req, res) => {
     try {
@@ -38,6 +44,7 @@ const placeOrder = async (req, res) => {
 
 
         let arr = [];
+        let updatedProducts = [];
 
         userCart.products.forEach((item) => {
             arr.push({
@@ -45,7 +52,19 @@ const placeOrder = async (req, res) => {
                 quantity: item.quantity,
                 subtotal: item.subtotal, // Make sure to include subtotal for each product
             });
+            updatedProducts.push({
+                productId: item.productId._id,
+                quantity: item.quantity,
+            });
         });
+        for (const updatedProduct of updatedProducts) {
+            const product = await Product.findById(updatedProduct.productId);
+            if (product) {
+                // Subtract the ordered quantity from the available quantity
+                product.quantity -= updatedProduct.quantity;
+                await product.save();
+            }
+        }
         const randomId = generateRandomId()
 
         function generateRandomId() {
@@ -89,6 +108,7 @@ const loadOrderDetails = async (req, res) => {
     try {
         const couponCode = req.body.couponCode
         const userId = req.session.userId
+        const admin = await User.findOne({ is_admin: 1 });
 
 
         console.log(userId)
@@ -101,7 +121,7 @@ const loadOrderDetails = async (req, res) => {
         const couponData = await Coupon.findOne({ couponCode: couponCode })
 
         console.log("orderID: " + orderData)
-        res.render('orderDetails', { orders: orderData, user: userData, coupon: couponData })
+        res.render('orderDetails', { orders: orderData, user: userData, coupon: couponData, formatedCouponDate,admin })
 
     } catch (error) {
         console.log(error.message)
@@ -116,19 +136,28 @@ const cancelOrder = async (req, res) => {
         const userData = await User.findById(userId);
         const cartData = await Cart.findOne({ userId: userId }).populate('products.productId').populate('userId');
         const orderData = await Orders.findById(orderId).populate('products.productId').populate('userId');
-
+       
         orderData.OrderStatus = 'Order Cancelled';
         await orderData.save();
-
+    
+   
         if (orderData.paymentStatus === 'Success') {
             userData.wallet += parseInt(orderData.totalAmount);
             console.log('total amount', orderData.totalAmount)
             console.log(userData.wallet)
+            userData.walletHistory.push({
+                type: 'credit', // or 'debit' depending on the scenario
+                amount: parseInt(orderData.totalAmount),
+                date: new Date()
+            });
+            
             await userData.save();
             res.redirect(`/orderDetails?id=${orderId}`);
         }
-
+  
         res.redirect(`/orderDetails?id=${orderId}`);
+   
+    
     } catch (error) {
         console.log(error.message);
     }
@@ -303,13 +332,15 @@ const checkWallet = async (req, res) => {
         const addressIndex = parseInt(req.query.addressIndex);
 
         const couponData = await Coupon.findOne({ couponCode: couponCode });
-
+        console.log('haii')
         if (couponData != null) {
             const finalPrice = totalAmount - couponData.discountAmount;
             totalAmount = finalPrice;
         }
         if (totalAmount > userData.wallet) {
+            console.log('hello')
             res.status(200).json({
+                
                 message: 'insufficient balance'
             })
         } else {
@@ -411,7 +442,8 @@ module.exports = {
     onlinePayment,
     paymentSuccess,
     checkWallet,
-    walletPayment
+    walletPayment,
+    formatedCouponDate
 }
 
 

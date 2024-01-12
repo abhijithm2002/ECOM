@@ -20,7 +20,8 @@ const orderSchema = new mongoose.Schema({
         subtotal: {
             type: Number,
             required: true
-        }
+        },
+      
     }],
     
     category: {
@@ -56,7 +57,8 @@ const orderSchema = new mongoose.Schema({
     addressIndex : {
         type : Number,
         default:0
-    }
+    },
+   
 });
 
 const Orders = mongoose.model('Orders', orderSchema);

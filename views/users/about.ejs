@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/page-about.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:21 GMT -->
+<head>
+    <meta charset="utf-8">
+    <title>CHASHMA</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/toplogo.jpeg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="assets/css/maind134.css?v=3.4">
+</head>
+
+<body>
+    <%- include('header') -%>
+    <main class="main single-page">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> 
+                </div>
+            </div>
+        </div>
+        <section class="section-padding">
+            <div class="container pt-25">
+                <div class="row">
+                    <div class="col-lg-6 align-self-center mb-lg-0 mb-4">
+                        <h6 class="mt-0 mb-15 text-uppercase font-sm text-brand wow fadeIn animated">About Us</h6>
+                        <h1 class="font-heading mb-40">
+                            Elevate Your Style with Premium Quality Sunglasses
+                        </h1>
+                        <p>Welcome to our world, where style meets substance. We take pride in offering an exquisite collection of high-quality sunglasses that not only protect your eyes but also elevate your fashion statement.</p>
+                        <p>At CHASHMA, we believe in providing more than just eyewear; we offer an experience. Our commitment to excellence is reflected in every pair of sunglasses we craft. Each design is a blend of fashion-forward aesthetics and cutting-edge technology, ensuring that you not only look good but also enjoy optimal eye protection.</p>
+                        <p>Our sunglasses are more than just accessories; they are a statement of individuality. Whether you prefer timeless classics, bold and modern styles, or sporty frames, we have a diverse range to suit every taste and occasion.</p>
+                        <p>As a company passionate about eyewear, we strive to stay ahead of trends, offering you the latest designs and innovations. Our dedication to quality extends beyond style to ensure durability and comfort, making our sunglasses the perfect companion for your daily adventures.</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="assets/imgs/page/about-1.png" alt="">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section-padding">
+            <div class="container pb-25">
+                <h3 class="section-title mb-20 wow fadeIn animated text-center"><span>Featured</span> Clients</h3>
+                <div class="carausel-6-columns text-center" id="carausel-6-columns-3">
+                    <% for(let i=0; i<brand.length ; i++){%>
+                    <div class="brand-logo" style="margin-right: 15px;">
+                        <img class="img-grey-hover" src="<%=brand[i].brandImage[0]%>" alt="">
+                    </div>
+                       <%}%>
+                </div>
+                </div>
+            </div>
+        </section>
+        <section id="work" class="mt-40 pt-50 pb-50 section-border">
+            <div class="container">
+                <div class="row mb-50">
+                    <div class="col-lg-12 col-md-12 text-center">
+                        <h6 class="mt-0 mb-5 text-uppercase text-brand font-sm wow fadeIn animated">CHASHMA</h6>
+                        <h2 class="mb-15 text-grey-1 wow fadeIn animated">Our main branches<br> around the world</h2>
+                       
+                    </div>
+                </div>
+                <div class="row justify-content-center align-items-center">
+                    <div class="col-md-4 text-center mb-md-0 mb-4">
+                        <img class="btn-shadow-brand hover-up border-radius-10 bg-brand-muted wow fadeIn animated" src="assets/imgs/page/company-4.jpg" alt="">
+                        <h4 class="mt-30 mb-15 wow fadeIn animated"><%= admin.address[0].houseName %>, <%= admin.address[0].city %> <br> <%= admin.address[0].pincode %> <%= admin.address[0].state %></h4>
+                        <p class="text-grey-3 wow fadeIn animated"> <%= admin.address[0].phone %> </p>
+                       
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- <section id="team" class="pt-25 wow fadeIn animated">
+            <div class="container">
+                <div class="row mb-50 align-items-center">
+                    <div class="col-md-6">
+                        <h6 class="mt-0 mb-15 text-uppercase font-sm text-brand wow fadeIn animated">Our Team</h6>
+                        <h2 class="mb-15 wow fadeIn animated">Top team of experts</h2>
+                        <p class="text-grey-3 wow fadeIn animated">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione optio perferendis sequi mollitia quis autem ea cupiditate possimus!</p>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-30">
+                        <a class="btn btn-outline btn-lg btn-brand-outline font-weight-bold text-brand text-hover-white border-radius-5 btn-shadow-brand hover-up">All Members</a>
+                    </div>
+                </div>
+                <div class="position-relative">
+                    <div class="row wow fadeIn animated">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="blog-card border-radius-10 overflow-hidden text-center">
+                                <img src="assets/imgs/page/avatar-1.jpg" alt="" class="border-radius-10 mb-30 hover-up">
+                                <h4 class="fw-500 mb-0">Patric Adams</h4>
+                                <p class="fw-400 text-brand mb-10">CEO & Co-Founder</p>
+                                <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0 animated">
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!--col-->
+                        <!-- <div class="col-lg-3 col-md-6">
+                            <div class="blog-card border-radius-10 overflow-hidden text-center">
+                                <img src="assets/imgs/page/avatar-2.jpg" alt="" class="border-radius-10 mb-30 hover-up">
+                                <h4 class="fw-500 mb-0">Dilan Specter</h4>
+                                <p class="fw-400 text-brand mb-10">Head Engineer</p>
+                                <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0 animated">
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!--col-->
+                        <!-- <div class="col-lg-3 col-md-6">
+                            <div class="blog-card border-radius-10 overflow-hidden text-center">
+                                <img src="assets/imgs/page/avatar-3.jpg" alt="" class="border-radius-10 mb-30 hover-up">
+                                <h4 class="fw-500 mb-0">Tomas Baker</h4>
+                                <p class="fw-400 text-brand mb-10">Senior Planner</p>
+                                <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0 animated">
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!--col-->
+                        <!-- <div class="col-lg-3 col-md-6">
+                            <div class="blog-card border-radius-10 overflow-hidden text-center">
+                                <img src="assets/imgs/page/avatar-4.jpg" alt="" class="border-radius-10 mb-30 hover-up">
+                                <h4 class="fw-500 mb-0">Norton Mendos</h4>
+                                <p class="fw-400 text-brand mb-10">Project Manager</p>
+                                <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0 animated">
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                                    <a href="#"><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!--col-->
+                    <!-- </div>
+                </div>
+            </div>
+        </section>
+        -->
+        
+       
+       
+    </main>
+    <%-include('footer')-%>
+    <!-- Preloader Start -->
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-5">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Vendor JS-->
+    <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/plugins/slick.js"></script>
+    <script src="assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="assets/js/plugins/wow.js"></script>
+    <script src="assets/js/plugins/jquery-ui.js"></script>
+    <script src="assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="assets/js/plugins/magnific-popup.js"></script>
+    <script src="assets/js/plugins/select2.min.js"></script>
+    <script src="assets/js/plugins/waypoints.js"></script>
+    <script src="assets/js/plugins/counterup.js"></script>
+    <script src="assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="assets/js/plugins/images-loaded.js"></script>
+    <script src="assets/js/plugins/isotope.js"></script>
+    <script src="assets/js/plugins/scrollup.js"></script>
+    <script src="assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
+    <!-- Template  JS -->
+    <script src="assets/js/maind134.js?v=3.4"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/page-about.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:46 GMT -->
+</html>

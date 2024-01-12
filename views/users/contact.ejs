@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/page-contact.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:05 GMT -->
+<head>
+    <meta charset="utf-8">
+    <title>CHASHMA</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/toplogo.jpeg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="assets/css/maind134.css?v=3.4">
+    <!--leaflet map-->
+    <link rel="stylesheet" href="../../../../unpkg.com/leaflet%401.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <script src="../../../../unpkg.com/leaflet%401.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+</head>
+
+<body>
+    <%- include('header') -%>
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span>
+                    <a href="/contact" rel="nofollow">contact us</a>
+                </div>
+            </div>
+        </div>
+        <section class="hero-2 bg-green">
+            <div class="hero-content">
+                <div class="container">
+                    <div class="text-center">
+                        <h4 class="text-brand mb-20">Get in touch</h4>
+                        <h1 class="mb-20 wow fadeIn animated font-xxl fw-900">
+                            Let's Collaborate on <br>Your <span class="text-style-1">Ideas</span>
+                        </h1>
+                        <p class="w-50 m-auto mb-50 wow fadeIn animated">We believe in the power of collaboration and innovation. Your ideas are unique and valuable, and we're excited to hear about them. Whether you have a project in mind, want to discuss a partnership, or simply share your creative thoughts, we are here to listen and turn your concepts into reality.</p>
+                        <p class="wow fadeIn animated">
+                            <a class="btn btn-brand btn-lg font-weight-bold text-white border-radius-5 btn-shadow-brand hover-up" href="/about">Get in Touch</a>
+                        </p>
+                        <p class="text-grey-3 wow fadeIn animated mt-3">Explore our website to learn more about us and our services. We look forward to connecting with you!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+       
+        <section class="pt-50 pb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-8 col-lg-10 m-auto">
+                        <div class="contact-from-area padding-20-row-col wow FadeInUp">
+                            <h3 class="mb-10 text-center">Drop Us a Line</h3>
+                          
+                            <form class="contact-form-style text-center" id="contact-form" action="/contact" method="post" onsubmit="return validateForm()">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="input-style mb-20">
+                                            <input name="name" id="name" placeholder="First Name" type="text">
+                                            <p id="nameError" class="error-message text-danger"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="input-style mb-20">
+                                            <input name="email" id="email" placeholder="Your Email" type="email">
+                                            <p id="emailError" class="error-message text-danger"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="input-style mb-20">
+                                            <input name="phone" id="phone" placeholder="Your Phone" type="tel">
+                                            <p id="phoneError" class="error-message text-danger"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="input-style mb-20">
+                                            <input name="subject" id="subject" placeholder="Subject" type="text">
+                                            <p id="subjectError" class="error-message text-danger"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="textarea-style mb-30">
+                                            <textarea name="message" id="message" placeholder="Message"></textarea>
+                                            <p id="messageError" class="error-message text-danger"></p>
+                                        </div>
+                                        <button class="submit submit-auto-width" type="submit">Send message</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <p class="form-message"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script>
+            function validateForm() {
+                var name = document.getElementById("name").value.trim();
+                var email = document.getElementById("email").value.trim();
+                var phone = document.getElementById("phone").value.trim();
+                var subject = document.getElementById("subject").value.trim();
+                var message = document.getElementById("message").value.trim();
+                
+                // Reset error messages
+                document.getElementById("nameError").innerHTML = "";
+                document.getElementById("emailError").innerHTML = "";
+                document.getElementById("phoneError").innerHTML = "";
+                document.getElementById("subjectError").innerHTML = "";
+                document.getElementById("messageError").innerHTML = "";
+        
+                // Validate name
+                if (name == "") {
+                    document.getElementById("nameError").innerHTML = "Please enter your name.";
+                    return false;
+                }
+        
+                // Validate email
+                var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    document.getElementById("emailError").innerHTML = "Please enter a valid email address.";
+                    return false;
+                }
+        
+                // Validate phone number
+                var phoneRegex = /^\d{10}$/; // Assumes a 10-digit phone number; adjust as needed
+                if (!phoneRegex.test(phone)) {
+                    document.getElementById("phoneError").innerHTML = "Please enter a valid 10-digit phone number.";
+                    return false;
+                }
+        
+                // Validate subject
+                if (subject == "") {
+                    document.getElementById("subjectError").innerHTML = "Please enter the subject.";
+                    return false;
+                }
+        
+                // Validate message
+                var wordCount = message.split(/\s+/).length;
+                if (wordCount < 30) {
+                    document.getElementById("messageError").innerHTML = "Please enter a message with at least 30 words.";
+                    return false;
+                }
+        
+                return true;
+            }
+        </script>
+        <section  class="pt-50 pb-50">
+            <div class="container">
+                <div class="text-center">
+                    <h4 class="mb-15 text-brand">OUR LOCATION</h4>
+                </div>
+                 <div class="mapouter" style="height: 400px; width: 100%;">
+                    <div class="gmap_canvas" style="height: 400px; width: 100%;">
+                      <iframe width="100%" height="400" id="gmap_canvas" src="https://maps.google.com/maps?q=vaikom&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+                    </div>
+                </div>
+            </div>
+    </section>
+    <br>
+    </main>
+    <%-include('footer')-%>
+    <!-- Preloader Start -->
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-5">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Vendor JS-->
+    <script data-cfasync="false" src="../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/plugins/slick.js"></script>
+    <script src="assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="assets/js/plugins/wow.js"></script>
+    <script src="assets/js/plugins/jquery-ui.js"></script>
+    <script src="assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="assets/js/plugins/magnific-popup.js"></script>
+    <script src="assets/js/plugins/select2.min.js"></script>
+    <script src="assets/js/plugins/waypoints.js"></script>
+    <script src="assets/js/plugins/counterup.js"></script>
+    <script src="assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="assets/js/plugins/images-loaded.js"></script>
+    <script src="assets/js/plugins/isotope.js"></script>
+    <script src="assets/js/plugins/scrollup.js"></script>
+    <script src="assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
+    <script src="assets/js/plugins/leaflet.js"></script>
+    <!-- Template  JS -->
+    <script src="assets/js/maind134.js?v=3.4"></script>
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/page-contact.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:10:07 GMT -->
+</html>

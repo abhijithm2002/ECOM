@@ -5,9 +5,12 @@ const Cart = require('../models/cartModel');
 
 const loadWishlist = async (req, res) => {
     try {
+
         const userId = req.session.userId;
         const isLoggedIn = !!req.session.userId
-
+        const admin = await User.findOne({ is_admin: 1 });
+        const productId = req.query.id;
+        const product = await Product.findById(productId)
         const user = await User.findById(userId);
         if (!userId) {
             return res.redirect('/login')
@@ -15,7 +18,8 @@ const loadWishlist = async (req, res) => {
 
         const wishlist = await Wishlist.findOne({ userId }).populate('products.productId');
 
-        res.render('wishlist', { wishlist, isLoggedIn, user });
+
+        res.render('wishlist', { wishlist, isLoggedIn, user,admin });
 
 
     } catch (error) {
@@ -34,7 +38,7 @@ const addToWishlist = async (req, res) => {
         if (!userId) {
             return res.redirect('/login');
         }
-
+         const product = await Product.findById(productId)
         let wishlistData = await Wishlist.findOne({ userId: userId });
 
         if (!wishlistData) {
