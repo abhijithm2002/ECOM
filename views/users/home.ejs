@@ -304,24 +304,19 @@
                 <!--End tab-content-->
             </div>
         </section>
+      
+        
         <% for (let i = 0; i < banners.length; i++) { %>
             <% if(banners[i].bannerName == 'banner 4') { %>
-                <section class="banner-2 section-padding pb-0">
-                    <div class="container" style="background-size: cover; height: 500px; border-radius: 10px">
-                        <div class="banner-img banner-big wow fadeIn animated f-none">
-                            <img src="<%= banners[i].bannerImage %>" alt="" style="width: 90%; height: 400px;">
-                            <div class="banner-text d-md-block d-none" style="position: absolute; bottom: 0; left: 0; padding: 20px; color: #fff;">
-                                <h4 class="mb-15 mt-40 text-brand">SHOP</h4>
-                                <h1 class="fw-600 mb-20"><%= banners[i].bannerText %><br> &Great Collection </h1>
-                                <a href="/productList" class="btn">shop <i class="fi-rs-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            <% } %>
-        <% } %>
-        
-        
+        <div class="banner-img banner-big wow fadeIn f-none animated mt-50">
+            <img class="border-radius-10" src="<%=banners[i].bannerImage[0]%>" alt="">
+            <div class="banner-text">
+              
+                <h1 class="fw-600 mb-20"><%= banners[i].bannerText %><br> &Great Collection </h1>
+                <a href="/productList" class="btn">shop <i class="fi-rs-arrow-right"></i></a>
+            </div>
+        </div>
+        <%}}%>
        
         <section class="popular-categories section-padding mt-15 mb-25">
             <div class="container wow fadeIn animated">

@@ -408,8 +408,12 @@
             </div>
             <div class="mobile-header-content-area">
                 <div class="mobile-search search-style-3 mobile-header-border">
-                    <form action="#">
-                        <input type="text" placeholder="Search for items…">
+                   
+                        <form action="/productList">
+                            <input type="text" name="search" value="<%=search%>" placeholder="Search for items...">
+                            <input type="hidden" name="category" value="<%= categoryId %>">
+                          
+                    
                         <button type="submit"><i class="fi-rs-search"></i></button>
                     </form>
                 </div>
