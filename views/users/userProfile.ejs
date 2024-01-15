@@ -389,6 +389,28 @@
             </div>
             </form>
         </section>
+        <!-- Include this script in your userProfile page -->
+<script>
+    // Check if there's session data indicating that the user has placed an order
+    const orderPlaced = sessionStorage.getItem('orderPlaced');
+
+    // If an order was placed, redirect to the cart and clear the session data
+    if (orderPlaced) {
+        sessionStorage.removeItem('orderPlaced');
+        window.location.href = '/addCart';
+    }
+
+    // Set session data when the user visits the userProfile page
+    sessionStorage.setItem('lastVisitedPage', '/userProfile');
+
+    // Disable caching to ensure back button behavior
+    window.onpageshow = function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    };
+</script>
+
 
     </main>
     <%-include('footer')-%>

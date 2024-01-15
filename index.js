@@ -5,10 +5,11 @@ const express = require("express")
 const session = require('express-session');
 const app = express();
 const path = require('path')
+const nocache = require('nocache')
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
 require('dotenv').config()
-
+app.use(nocache())
 
 app.use(session({
   secret: 'your-secret-key',

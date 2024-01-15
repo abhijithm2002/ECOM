@@ -41,7 +41,8 @@
                 </div>
             </div>
         </div>
-       
+        
+        
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row">
@@ -188,12 +189,14 @@
                             </div>
                             <%}%>
                     </div>
-
+                    <%for(let i=0;i<cart.products.length;i++){%>
                     <div class="col-md-6">
                         <div class="order_review">
                             <div class="mb-20">
                                 <h4>Your Orders</h4>
                             </div>
+                         
+                               
                             <div class="table-responsive order_table text-center">
                                 <table class="table">
                                     <thead>
@@ -203,7 +206,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <%for(let i=0;i<cart.products.length;i++){%>
+                                      
                                             <tr>
                                                 <td class="image product-thumbnail"><img
                                                         src="<%= cart.products[i].productId.image[0]%>" alt="#"></td>
@@ -218,7 +221,7 @@
                                                 </td>
                                             </tr>
                                             
-                                            <%}%>
+                                            
                                                 <tr>
                                                     <th>Shipping</th>
                                                     <td colspan="2"><em>Free Shipping</em></td>
@@ -243,6 +246,7 @@
                                 
 
                             </div>
+                            
                             <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                             <div class="payment_method">
                                 <div class="mb-25">
@@ -271,13 +275,25 @@
                                     </div>
                                 </div>
                                 
-                                <% if(user.address.length > 0) { %>
+                                <!-- <% if(user.address.length > 0) { %>
                                     <button type="submit" id="cashOnDeliveryBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30">Place Order(COD)</button>
                                     <button type="submit" id="paypalBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30" style="display: none;">Place Order(Razorpay)</button>
                                     <button id="walletBtn" class="btn btn-fill-out btn-block mt-30" style="display: none;" onclick="navigateToCheckWallet(event)">Pay wallet</button>
+                                <% } %> -->
+                                <% if (user.address.length > 0) { %>
+                                    <!-- Display buttons for placing order if the user has addresses -->
+                                    <button type="submit" id="cashOnDeliveryBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30">Place Order(COD)</button>
+                                    <button type="submit" id="paypalBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30" style="display: none;">Place Order(Razorpay)</button>
+                                    <button id="walletBtn" class="btn btn-fill-out btn-block mt-30" style="display: none;" onclick="navigateToCheckWallet(event)">Pay wallet</button>
+                                <% } else { %>
+                                    <!-- Display a message if the user has no addresses added -->
+                                    <div class="alert alert-warning mt-3" role="alert">
+                                        Please add an address before placing an order.
+                                    </div>
                                 <% } %>
-                                
+                                <%}%>
                                 <div id="messageContainer"></div>
+                               
                                 <!-- <script>
                                     function navigateToCheckWallet(event) {
                                         event.preventDefault(); // Add parentheses here

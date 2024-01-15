@@ -19,7 +19,7 @@ const formatedCouponDate = (date) => {
 
 const placeOrder = async (req, res) => {
     try {
-
+        let orderPlaced = false;
         const couponCode = req.body.couponSelected
         const userId = req.session.userId;
         const userData = await User.findById(userId)
@@ -90,6 +90,7 @@ const placeOrder = async (req, res) => {
 
 
         if (orderData) {
+            orderPlaced = true;
             userCart.products = [];
             await userCart.save();
             setTimeout(() => {

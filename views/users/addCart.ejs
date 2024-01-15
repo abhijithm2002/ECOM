@@ -546,6 +546,15 @@
                 </div>
             </div>
         </section>
+        <!-- Include this script in your cart page -->
+<script>
+    // Clear session data when the user visits the cart
+    sessionStorage.removeItem('orderPlaced');
+
+    // Set session data when the user visits the cart
+    sessionStorage.setItem('lastVisitedPage', '/addCart');
+</script>
+
     </main>
     <%-include('footer')-%>
     <!-- Preloader Start -->

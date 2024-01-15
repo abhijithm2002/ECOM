@@ -34,8 +34,9 @@ const isLogout = async (req, res, next) => {
     try {
         if (req.session.userId) {
             return res.redirect("/home"); // return here to stop further execution
-        }
+        }else{
         next();
+        }
     } catch (error) {
         console.log(error.message);
         next(error); // pass the error to the error handling middleware
@@ -47,8 +48,9 @@ const isBlocked = async(req, res, next)=>{
         const userData = await User.findById(userId)
         if(userData && userData.is_active === false){
             res.redirect('/login')
-        }
+        }else{
         next();
+        }
     } catch (error) {
         console.log(error.message)
     }

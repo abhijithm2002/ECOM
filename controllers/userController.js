@@ -81,6 +81,7 @@ const userLogout = async (req, res) => {
         //         res.redirect('/login')
         //     }
         // });
+      
         delete req.session.userId
         req.session.save();
         res.redirect('/login')
@@ -191,7 +192,7 @@ const loadVerifyOtp = async (req, res) => {
                 console.log('Email sent: ' + info.response);
             }
         });
-        const message = 'otp sent successfully';
+        const message = 'otp sent successfully to Email';
         res.render('verifyOtp', { message })
 
 
@@ -812,9 +813,9 @@ const loadCheckout = async (req, res) => {
             'redeemUsers.userId': { $ne: userId }, // Exclude coupons redeemed by the user
         });
 
-
+        const orderPlaced = false; 
         console.log(user)
-        res.render('checkout', { user, cart, subtotal, coupon, message: "", isLoggedIn ,admin})
+        res.render('checkout', { user, cart, subtotal, coupon, message: "", isLoggedIn ,admin, orderPlaced})
     } catch (error) {
         console.log(error.message)
     }
