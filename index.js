@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-mongoose.connect("mongodb+srv://abhijithm050:Abhijithm2002@cluster0.zapwzr2.mongodb.net/Ecommerce");
+mongoose.connect("mongodb+srv://abhijithm050:Abhijithm2002@cluster0.zapwzr2.mongodb.net/?retryWrites=true&w=majority/Ecommerce");
 
 const express = require("express")
 const session = require('express-session');
