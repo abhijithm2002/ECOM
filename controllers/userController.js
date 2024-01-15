@@ -8,7 +8,7 @@ const Banner = require('../models/bannerModel')
 const Brand = require('../models/brandModel')
 const Contact = require('../models/contactModel');
 const nodemailer = require('nodemailer')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const moment = require('moment')
 const RandomString = require('randomstring');
 
