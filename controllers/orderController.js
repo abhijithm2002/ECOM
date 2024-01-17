@@ -93,6 +93,8 @@ const placeOrder = async (req, res) => {
             orderPlaced = true;
             userCart.products = [];
             await userCart.save();
+            console.log('//////////////////////////////////////////');
+            console.log(userCart);
             setTimeout(() => {
                 res.redirect('/userProfile');
             }, 1500);

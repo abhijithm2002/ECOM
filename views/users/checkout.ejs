@@ -52,10 +52,12 @@
                                     href="#coupon" data-bs-toggle="collapse" class="collapsed"
                                     aria-expanded="false">Click here to see Available codes</a></span>
                         </div>
+                    
                         <div class="panel-collapse collapse coupon_form " id="coupon">
                             <div class="panel-body">
+                                <% if (coupon.length > 0) { %>
                                 <p class="mb-30 font-sm">Already having  coupon code, please chose it from below.</p>
-                             
+                           
                                 <form method="post">
                                     <div class="form-group">
                                         <%for(i = 0 ; i<coupon.length; i++) {%>
@@ -71,7 +73,9 @@
                                     </div>
                                    
                                 </form>
-                                
+                                <% } else { %>
+                                    <p class="mb-30 font-sm">Coupon is not available.</p>
+                                <% } %>
                                
                             </div>
                         </div>
@@ -189,14 +193,17 @@
                             </div>
                             <%}%>
                     </div>
-                    <%for(let i=0;i<cart.products.length;i++){%>
+                    <% if(cart.products.length > 0){%>
+                    
                     <div class="col-md-6">
+                       
                         <div class="order_review">
                             <div class="mb-20">
                                 <h4>Your Orders</h4>
+                            
                             </div>
-                         
-                               
+                            <%for(let i=0;i<cart.products.length;i++){%> 
+                           
                             <div class="table-responsive order_table text-center">
                                 <table class="table">
                                     <thead>
@@ -206,7 +213,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                      
+                                       
                                             <tr>
                                                 <td class="image product-thumbnail"><img
                                                         src="<%= cart.products[i].productId.image[0]%>" alt="#"></td>
@@ -243,15 +250,14 @@
                                                 
                                     </tbody>
                                 </table>
-                                
+                              
 
                             </div>
-                            
+                            <%}%>
                             <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                           
                             <div class="payment_method">
-                                <div class="mb-25">
-                                    <h5>Payment</h5>
-                                </div>
+                                
                                 
                                 <div class="payment_method">
                                     <div class="mb-25">
@@ -274,7 +280,7 @@
                                         <label class="form-check-label" for="exampleRadios5">Razorpay</label>
                                     </div>
                                 </div>
-                                
+                               
                                 <!-- <% if(user.address.length > 0) { %>
                                     <button type="submit" id="cashOnDeliveryBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30">Place Order(COD)</button>
                                     <button type="submit" id="paypalBtn" onclick="sweetAlert()" class="btn btn-fill-out btn-block mt-30" style="display: none;">Place Order(Razorpay)</button>
@@ -291,9 +297,9 @@
                                         Please add an address before placing an order.
                                     </div>
                                 <% } %>
-                                <%}%>
-                                <div id="messageContainer"></div>
                                
+                                <div id="messageContainer"></div>
+                                
                                 <!-- <script>
                                     function navigateToCheckWallet(event) {
                                         event.preventDefault(); // Add parentheses here
@@ -339,9 +345,14 @@
                                 
                             
                         </div>
+                        
                     </div>
+                   
+                                
+                    <%}%>
                 </div>
             </form>
+            
             <!-- <script>
                 document.getElementById('walletBtn').addEventListener('click', function () {
                     // Set the form action to the specific route for wallet payment

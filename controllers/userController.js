@@ -448,6 +448,7 @@ const loadProductDetails = async (req, res) => {
         const user = await User.findById(userId);
         const productId = req.query.productId;
         const product = await Product.findById(productId);
+        
         const banners = await Banner.find({is_active : true})
         console.log(product.quantity);
         const admin = await User.findOne({ is_admin: 1 });
@@ -457,7 +458,7 @@ const loadProductDetails = async (req, res) => {
            
             _id: { $ne: productId }, 
         })
-        res.render('productDetails', { product, isLoggedIn, user, admin, quantity: product.quantity, productId, relatedProducts , banners});
+        res.render('productDetails', {product, isLoggedIn, user, admin, quantity: product.quantity, productId, relatedProducts , banners});
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
